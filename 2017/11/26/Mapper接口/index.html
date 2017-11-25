@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="title:Mapper接口date:2017年11月25日17:27:07 categories:Mybatis 前言之前在说到Mybatis插件的时候说以后要好好分析下Mybatis的四大组件，之前一直在为公司忙搭建RocketMQ消息集群的事情，就耽误了一段时间，最近终于有时间来分析下了，要分析四大组件，还是要从">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迷途书童的博客">
+<meta property="og:url" content="https://cong96.github.io/2017/11/26/Mapper接口/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="title:Mapper接口date:2017年11月25日17:27:07 categories:Mybatis 前言之前在说到Mybatis插件的时候说以后要好好分析下Mybatis的四大组件，之前一直在为公司忙搭建RocketMQ消息集群的事情，就耽误了一段时间，最近终于有时间来分析下了，要分析四大组件，还是要从一次完整的查询过程说起，把Mybatis的核心源码都过一遍。 从一次查询说起我">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-11-25T17:06:29.912Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="迷途书童的博客">
+<meta name="twitter:description" content="title:Mapper接口date:2017年11月25日17:27:07 categories:Mybatis 前言之前在说到Mybatis插件的时候说以后要好好分析下Mybatis的四大组件，之前一直在为公司忙搭建RocketMQ消息集群的事情，就耽误了一段时间，最近终于有时间来分析下了，要分析四大组件，还是要从一次完整的查询过程说起，把Mybatis的核心源码都过一遍。 从一次查询说起我">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Mapper接口" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/26/Mapper接口/" class="article-date">
+  <time datetime="2017-11-25T16:59:25.391Z" itemprop="datePublished">2017-11-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>title:Mapper接口<br>date:2017年11月25日17:27:07</p>
+<h2 id="categories-Mybatis"><a href="#categories-Mybatis" class="headerlink" title="categories:Mybatis"></a>categories:Mybatis</h2><hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前在说到Mybatis插件的时候说以后要好好分析下Mybatis的四大组件，之前一直在为公司忙搭建RocketMQ消息集群的事情，就耽误了一段时间，最近终于有时间来分析下了，要分析四大组件，还是要从一次完整的查询过程说起，把Mybatis的核心源码都过一遍。</p>
+<h3 id="从一次查询说起"><a href="#从一次查询说起" class="headerlink" title="从一次查询说起"></a>从一次查询说起</h3><p>我们做一次Mybatis的查询测试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSelect</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	SqlSession session = <span class="keyword">null</span>;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		session = MybatisUtil.getCurrentSession();</span><br><span class="line">		UserDao userDao = session.getMapper(UserDao.class);</span><br><span class="line">		List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">		list.add(<span class="number">1</span>);</span><br><span class="line">		list.add(<span class="number">3</span>);</span><br><span class="line">		list.add(<span class="number">25</span>);</span><br><span class="line">		List&lt;User&gt; userList = userDao.queryList(list);</span><br><span class="line">		System.out.println(JSON.toJSONString(userList));</span><br><span class="line"></span><br><span class="line">	&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		<span class="comment">// <span class="doctag">TODO:</span> handle exception</span></span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (session != <span class="keyword">null</span>)</span><br><span class="line">			session.close();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的Mapper配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span><br><span class="line">&lt;mapper namespace=&quot;com.wangcc.mybatis.dao.UserDao&quot;&gt;</span><br><span class="line">&lt;resultMap type=&quot;User&quot; id=&quot;UserMapper&quot;&gt;</span><br><span class="line">&lt;result property=&quot;id&quot; column=&quot;t_id&quot;/&gt;</span><br><span class="line">&lt;result property=&quot;name&quot; column=&quot;t_name&quot;/&gt;</span><br><span class="line">&lt;/resultMap&gt;</span><br><span class="line">&lt;select id=&quot;queryList&quot; resultMap=&quot;UserMapper&quot;&gt;</span><br><span class="line">select * from t_user where t_id in </span><br><span class="line">&lt;foreach collection=&quot;list&quot; item=&quot;uId&quot; index=&quot;index&quot; open=&quot;(&quot; separator=&quot;,&quot; close=&quot;)&quot;&gt;#&#123;uId&#125;&lt;/foreach&gt;</span><br><span class="line"></span><br><span class="line">&lt;/select&gt;</span><br><span class="line">&lt;insert id=&quot;insert&quot; parameterType=&quot;User&quot;&gt;</span><br><span class="line"></span><br><span class="line">insert into t_user (t_name,address) values(#&#123;name&#125;,#&#123;address&#125;)</span><br><span class="line">&lt;/insert&gt;</span><br><span class="line">&lt;insert id=&quot;batchInsert&quot; &gt;</span><br><span class="line">insert into t_user (t_name,address) values &lt;foreach collection=&quot;list&quot; item=&quot;user&quot; separator=&quot;,&quot;&gt;</span><br><span class="line">(#&#123;user.name&#125;,#&#123;user.address&#125;)</span><br><span class="line">&lt;/foreach&gt;</span><br><span class="line"></span><br><span class="line">&lt;/insert&gt;</span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+<p>如果你是初次使用Mybatis，那么你一定会好奇为什么这里的UserDao都是接口并不是具体的实现类。</p>
+<p>而如果你熟悉JDK动态代理，那么一看到这种接口可以直接执行方法的情况，那么肯定是用了代理，那么虽然我们能够知道为什么可以直接执行，但是我们也要了解他具体是怎么实现的。我们就以</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UserDao userDao = session.getMapper(UserDao.class);</span><br></pre></td></tr></table></figure>
+<p>为Debug入口。</p>
+<p>进入getMapper方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getMapper</span><span class="params">(Class&lt;T&gt; type)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> configuration.&lt;T&gt;getMapper(type, <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们发现还是调用了构建SqlSession的最重要的对象Configuration的方法。</p>
+<p>DefaultSqlSession对象中保存着Configuration对象的引用。</p>
+<p>进入到Configuration中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getMapper</span><span class="params">(Class&lt;T&gt; type, SqlSession sqlSession)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> mapperRegistry.getMapper(type, sqlSession);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们发现是调用的MapperRegistry对象（Configuration保存着其引用，在初始化Mybatis的配置文件的时候，就会将所有的Mapper接口注册到MapperRegistry的Map\<class<?>, MapperProxyFactory&lt;?&gt;&gt; knownMappersz这个HashMap对象中，在注册的过程中Mapper接口会被封装为MapperProxyFactory对象）</class<?></p>
+<p>我们看看MapperRegistry中的geMapper方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getMapper</span><span class="params">(Class&lt;T&gt; type, SqlSession sqlSession)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//在knownMappers中查找是否已经注册了，如果没有注册直接抛出异常，注册Mapper接口是在初始化Mybatis配置文件时必须就要完成的工作，不能在调用getMapper的时候再动态去注册</span></span><br><span class="line">    <span class="keyword">final</span> MapperProxyFactory&lt;T&gt; mapperProxyFactory = (MapperProxyFactory&lt;T&gt;) knownMappers.get(type);</span><br><span class="line">    <span class="keyword">if</span> (mapperProxyFactory == <span class="keyword">null</span>)</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> BindingException(<span class="string">"Type "</span> + type + <span class="string">" is not known to the MapperRegistry."</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line"> </span><br><span class="line">      <span class="keyword">return</span> mapperProxyFactory.newInstance(sqlSession);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> BindingException(<span class="string">"Error getting mapper instance. Cause: "</span> + e, e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>进入newInstance方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> T <span class="title">newInstance</span><span class="params">(SqlSession sqlSession)</span> </span>&#123;</span><br><span class="line"><span class="comment">//封装了一个MapperProxy对象,即组合模式，为了解耦，我们一般能不用继承就不用继续，尽量使用组合，这里MapperProxy是实现了InvocationHandler接口的类</span></span><br><span class="line">   <span class="keyword">final</span> MapperProxy&lt;T&gt; mapperProxy = <span class="keyword">new</span> MapperProxy&lt;T&gt;(sqlSession, mapperInterface, methodCache);</span><br><span class="line">   <span class="keyword">return</span> newInstance(mapperProxy);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p> newInstance(mapperProxy) 得到Mapper接口的代理对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line"><span class="function"><span class="keyword">protected</span> T <span class="title">newInstance</span><span class="params">(MapperProxy&lt;T&gt; mapperProxy)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), <span class="keyword">new</span> Class[] &#123; mapperInterface &#125;, mapperProxy);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>到现在，如何得到Mapper接口的代理对象的流程就走完了</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2017/11/26/Mapper接口/" data-id="cjafl8ufi00005sbzeieu2sxd" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/11/26/MapperMethod/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/“Java基础”/">“Java基础”</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/11/26/Mapper接口/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/26/MapperMethod/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/22/Mybatis插件/">Mybatis组件</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/19/HashMap/">HashMap</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/19/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
