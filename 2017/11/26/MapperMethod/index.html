@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>迷途书童的博客</title>
+  <title>MapperMethod | 迷途书童的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="title:MapperMethoddate:2017年11月25日22:20:53categories:Mybatis   我们接着上面继续分析 123456789101112131415161718192021@Test	public void testSelect() &amp;#123;		SqlSession">
+  <meta name="description" content="我们接着上面继续分析 123456789101112131415161718192021@Test	public void testSelect() &amp;#123;		SqlSession session = null;		try &amp;#123;			session = MybatisUtil.getCur">
 <meta property="og:type" content="article">
-<meta property="og:title" content="迷途书童的博客">
+<meta property="og:title" content="MapperMethod">
 <meta property="og:url" content="https://cong96.github.io/2017/11/26/MapperMethod/index.html">
 <meta property="og:site_name" content="迷途书童的博客">
-<meta property="og:description" content="title:MapperMethoddate:2017年11月25日22:20:53categories:Mybatis   我们接着上面继续分析 123456789101112131415161718192021@Test	public void testSelect() &amp;#123;		SqlSession session = null;		try &amp;#123;			session = My">
+<meta property="og:description" content="我们接着上面继续分析 123456789101112131415161718192021@Test	public void testSelect() &amp;#123;		SqlSession session = null;		try &amp;#123;			session = MybatisUtil.getCurrentSession();			UserDao userDao = session.getM">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-11-25T16:48:53.502Z">
+<meta property="og:updated_time" content="2017-11-25T17:13:00.373Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="迷途书童的博客">
-<meta name="twitter:description" content="title:MapperMethoddate:2017年11月25日22:20:53categories:Mybatis   我们接着上面继续分析 123456789101112131415161718192021@Test	public void testSelect() &amp;#123;		SqlSession session = null;		try &amp;#123;			session = My">
+<meta name="twitter:title" content="MapperMethod">
+<meta name="twitter:description" content="我们接着上面继续分析 123456789101112131415161718192021@Test	public void testSelect() &amp;#123;		SqlSession session = null;		try &amp;#123;			session = MybatisUtil.getCurrentSession();			UserDao userDao = session.getM">
   
     <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
   
@@ -74,16 +74,27 @@
   <time datetime="2017-11-25T16:59:07.345Z" itemprop="datePublished">2017-11-26</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Mybatis/">Mybatis</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MapperMethod
+    </h1>
+  
+
+      </header>
+    
     <div class="article-entry" itemprop="articleBody">
       
         <hr>
-<p>title:MapperMethod<br>date:2017年11月25日22:20:53<br>categories:Mybatis</p>
-<hr>
-<hr>
 <p>我们接着上面继续分析</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSelect</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		SqlSession session = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			session = MybatisUtil.getCurrentSession();</span><br><span class="line">			UserDao userDao = session.getMapper(UserDao.class);</span><br><span class="line">			List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">			list.add(<span class="number">1</span>);</span><br><span class="line">			list.add(<span class="number">3</span>);</span><br><span class="line">			list.add(<span class="number">25</span>);</span><br><span class="line">          </span><br><span class="line">			List&lt;User&gt; userList = userDao.queryList(list);</span><br><span class="line">			System.out.println(JSON.toJSONString(userList));</span><br><span class="line"></span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			<span class="comment">// <span class="doctag">TODO:</span> handle exception</span></span><br><span class="line">		&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> (session != <span class="keyword">null</span>)</span><br><span class="line">				session.close();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
 <p>我们都这一句代码进行DEBUG</p>
@@ -159,7 +170,7 @@
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          (no title)
+          Mapper接口
         
       </div>
     </a>
@@ -211,11 +222,11 @@
       <ul>
         
           <li>
-            <a href="/2017/11/26/Mapper接口/">(no title)</a>
+            <a href="/2017/11/26/Mapper接口/">Mapper接口</a>
           </li>
         
           <li>
-            <a href="/2017/11/26/MapperMethod/">(no title)</a>
+            <a href="/2017/11/26/MapperMethod/">MapperMethod</a>
           </li>
         
           <li>
