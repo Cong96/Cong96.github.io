@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>String类 | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言在我看来，任何一门程序语言，使用到最多的都是字符串。而在Java中，我们使用String类来表示字符串。在Java中，字符串类型不是基本类型，但他依然是一个非常重要的类型。今天我们将从几个方面来分析下这个我们在编程中使用最频繁的类String。 为什么说String是不可变的 什么是不可变 我的理解是说你对一个字符">
+<meta property="og:type" content="article">
+<meta property="og:title" content="String类">
+<meta property="og:url" content="https://cong96.github.io/2017/12/13/String/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言在我看来，任何一门程序语言，使用到最多的都是字符串。而在Java中，我们使用String类来表示字符串。在Java中，字符串类型不是基本类型，但他依然是一个非常重要的类型。今天我们将从几个方面来分析下这个我们在编程中使用最频繁的类String。 为什么说String是不可变的 什么是不可变 我的理解是说你对一个字符串的任何修改操作都会生成一个新的对象，而不是在原有的对象内存中修改，这就是St">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-13T12:34:43.131Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="String类">
+<meta name="twitter:description" content="前言在我看来，任何一门程序语言，使用到最多的都是字符串。而在Java中，我们使用String类来表示字符串。在Java中，字符串类型不是基本类型，但他依然是一个非常重要的类型。今天我们将从几个方面来分析下这个我们在编程中使用最频繁的类String。 为什么说String是不可变的 什么是不可变 我的理解是说你对一个字符串的任何修改操作都会生成一个新的对象，而不是在原有的对象内存中修改，这就是St">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-String" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/13/String/" class="article-date">
+  <time datetime="2017-12-13T12:48:49.208Z" itemprop="datePublished">2017-12-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      String类
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在我看来，任何一门程序语言，使用到最多的都是字符串。而在Java中，我们使用String类来表示字符串。在Java中，字符串类型不是基本类型，但他依然是一个非常重要的类型。今天我们将从几个方面来分析下这个我们在编程中使用最频繁的类String。</p>
+<h3 id="为什么说String是不可变的"><a href="#为什么说String是不可变的" class="headerlink" title="为什么说String是不可变的"></a>为什么说String是不可变的</h3><ul>
+<li><p><strong>什么是不可变</strong></p>
+<p>我的理解是说你对一个字符串的任何修改操作都会生成一个新的对象，而不是在原有的对象内存中修改，这就是String的不可变。</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>为什么不可变</strong></p>
+<p>要探究String为什么是不可变的，我们必须要去看String的源码了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">String</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span>, <span class="title">Comparable</span>&lt;<span class="title">String</span>&gt;, <span class="title">CharSequence</span> </span>&#123;</span><br><span class="line">    <span class="comment">/** The value is used for character storage. */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">char</span> value[];</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>我们只给出最关键的三行源码，我们通过观察源码可以知道，String的底层实现的是依靠char数组的。</p>
+<p>而且我们发现String这个类使用了final来修饰，有些人是不是看到String使用了final修饰就说这个就是String类是不可变的呢，很遗憾的说，并不是，并没有那么简单，这里为什么要用final修饰，你需要真正明白final这个关键字修饰类时候的作用，这里先不说为什么要用final修饰，但是可以先告诉大家，肯定是有作用的，但是并不是关键。</p>
+<p>我们先需要分析这个关键的底层实现-char数组。</p>
+<p>我们发现这个数组也是使用了final修饰，那是不是意味着这个终于是String不可变的关键了呢？很遗憾，也不是，我们来回顾一下final关键字在修饰变量的时候的作用把：</p>
+<p>当final修饰基本类型时，其数值一旦在初始化之后便不能更改。<br><strong>当final修饰普通类型时，一旦该引用指向了一个对象，便该引用不能再指向另一对象，也就是说该引用指向的堆内存空间地址是一个固定值，不能改变。 </strong></p>
+<p>我们看到这里使用final修饰了一个char类型的数组，char类型是基本类型，但是char数组并不属于基本类型，属于引用类型（关于Java中的数组，后面会讲到）。既然是引用，那我们就知道了，虽然我们不能改变这个引用指向的内存地址，但是，我们能够改变这个引用指向的堆内存中的具体内容。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">arrayTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">char</span>[] c= &#123;<span class="string">'d'</span>,<span class="string">'g'</span>&#125;;</span><br><span class="line">	System.out.println(c);</span><br><span class="line">	c[<span class="number">1</span>]= <span class="string">'k'</span>;</span><br><span class="line">	System.out.println(c);</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dg</span><br><span class="line">dk</span><br></pre></td></tr></table></figure>
+<p>很明显改变了引用指向的堆内存中的具体内容，所以仅仅是final修饰了这个数组引用，并不能做到我们要求的即不改变引用的指向，也不改变具体内容。</p>
+<p>String之所以不可变，关键是因为SUN公司的工程师在String类的所有方法中都很小心的没有去动这个数组中的元素，而且没有暴露内部成员变量。所以说，private这个限定符的作用在这里比final关键字作用还要大，他防止用户可以直接的去使用这个数组。这就防止了用户直接通过String类去获得char数组，进入对其作出修改，想必说到这里，你应该知道为什么String类需要使用final修饰了把，这是为了防止其他的类来继承String来破坏他的不可变性。我们一定要明白，String之所以不可变，和final真的没有太大的关系，但是使用final还是有其作用的。</p>
+<p>但是还有一个问题，String类真的能保证完全的不可变吗？</p>
+<p>因为Java中反射的存在，导致了程序员还是可以去改变SUN公司的大佬们辛辛苦苦封装好的String类的。</p>
+<p>反射是Java中一个强大的技术，但是也带来了一些问题，之前我们就在序列化的时候，说过反射破坏序列化的问题。</p>
+<p>现在我们就简单来看下反射是如何破坏String的不可变的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reflectTest</span><span class="params">()</span> <span class="keyword">throws</span> NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException </span>&#123;</span><br><span class="line">	String s=<span class="string">"kobe"</span>;</span><br><span class="line">	Field field=s.getClass().getDeclaredField(<span class="string">"value"</span>);</span><br><span class="line">	field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">	<span class="keyword">char</span>[] c=(<span class="keyword">char</span>[]) field.get(s);</span><br><span class="line">	c[<span class="number">2</span>]=<span class="string">'j'</span>;</span><br><span class="line">	System.out.println(s);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的程序里，我们就利用了反射来更改了String,这样做确实是改变了String的不变性，但是一般我们并不会这样去做。</p>
+</li>
+<li><p><strong>不可变的优势</strong></p>
+<p>我们都知道String是不可变的，那么到底为什么Java的设计者要把String设计成不可变的呢？大家有想过这个问题吗？今天我们就来通过代码来看看把String设计成不可变的优势。</p>
+<ul>
+<li><p>StringBuilder和String</p>
+</li>
+<li><p>在多线程环境中的优势</p>
+</li>
+<li><p>String在字符串常量池中的特性</p>
+<p>我们都知道，当出现如下代码的时候：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String a=<span class="string">"aaa"</span>;</span><br><span class="line">String b=<span class="string">"aaa"</span>;</span><br></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>a和b两个引用都指向字符串常量池(JDK1.6及之前，常量池位于方法区内(方法区逻辑上也是在堆中，但是我们习惯把它称为非堆区域)，在JDK1.7及之后，我们的常量池之间位于堆中了)中的同一个内存块。这样在大量使用字符串的时候，就可以节约大量的内存，而想要实现这个特性，我们的最基本的前提就是保证String不可变。</p>
+<h3 id="String的intern-方法"><a href="#String的intern-方法" class="headerlink" title="String的intern()方法"></a>String的intern()方法</h3><p>在讲述了String不可变之后，我们在来看看String中的一个很特别的方法intern()方法，我们对这个方法的分析有利于我们了解JMM（Java内存模型）。</p>
+<p>首先，我们来看下intern()这个方法是用来干什么的。他是一个native本地方法，最开始的初衷是用来重用String对象，以节省内存消耗。</p>
+<p>那么我们就先通过代码证明一下是否真的可以这样。</p>
+<p>给出一个测试方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   Integer[] sample = <span class="keyword">new</span> Integer[<span class="number">10</span>];  </span><br><span class="line">    Random random = <span class="keyword">new</span> Random(<span class="number">1000</span>);  </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sample.length; i++) &#123;  </span><br><span class="line">        sample[i] = random.nextInt();  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="comment">//记录程序开始时间  </span></span><br><span class="line">    <span class="keyword">long</span> t = System.currentTimeMillis();  </span><br><span class="line">    <span class="comment">//使用/不使用intern方法为10万个String赋值，值来自于Integer数组的10个数  </span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MAX; i++) &#123;  </span><br><span class="line">        	<span class="comment">//arr[i] = new String(String.valueOf(sample[i % sample.length]));  </span></span><br><span class="line">            arr[i] = <span class="keyword">new</span> String(String.valueOf(sample[i % sample.length])).intern();  </span><br><span class="line">        &#125;  </span><br><span class="line">        System.out.println((System.currentTimeMillis() - t) + <span class="string">"ms"</span>);  </span><br><span class="line">        System.gc();  </span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>先定义一个长度为10的Integer数组，并随机为其赋值，在通过for循环为长度为10万的String对象依次赋值，这些值都来自于Integer数组。两种情况分别运行，可通过Window —&gt; Preferences –&gt; Java –&gt; Installed JREs设置JVM启动参数为-agentlib:hprof=heap=dump,format=b，将程序运行完后的hprof置于工程目录下。再通过MAT插件查看该hprof文件。（注:intern()方法的内容大多引用一篇博客：<a href="http://blog.csdn.net/seu_calvin/article/details/52291082）" target="_blank" rel="noopener">http://blog.csdn.net/seu_calvin/article/details/52291082）</a></p>
+<p>我们会发现使用了intern()方法之后生成的String对象确实是减少了很多。</p>
+<p>不过我们今天要介绍这个方法的主要原因并不是这个点，主要是要解开由下面这段代码的输出结果带来的困惑：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">internTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">  <span class="comment">//String s1="KOBE";</span></span><br><span class="line"> String s3 = <span class="keyword">new</span> String(<span class="string">"KO"</span>) + <span class="keyword">new</span> String(<span class="string">"BE"</span>);  </span><br><span class="line"> s3.intern();  </span><br><span class="line"> String s4 = <span class="string">"KOBE"</span>;  </span><br><span class="line"> System.out.println(s3.intern()==s4);</span><br><span class="line"> System.out.println(s3 == s4);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们运行代码输出为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">true</span><br><span class="line">true</span><br></pre></td></tr></table></figure>
+<p>而当我们把注释放开的时候，即在前面加一行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s1=<span class="string">"KOBE"</span>;</span><br></pre></td></tr></table></figure>
+<p>我们再运行的时候，就会发现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">false</span><br><span class="line">false</span><br></pre></td></tr></table></figure>
+<p>注：上面的代码是在JDK1.8的环境下测试的</p>
+<p>你会不会觉得奇怪，为什么加了一行代码，就导致了结果的完全不同呢？</p>
+<p>这就需要我们深入的去了解intern()方法</p>
+<p><strong>深入理解intern()方法</strong></p>
+<p>之前有有提到JDK1.7后，常量池被放入到堆空间中，这导致intern()函数的功能不同，具体怎么个不同法，且看看下面代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">internTest1</span><span class="params">()</span> </span>&#123;</span><br><span class="line"> String s = <span class="keyword">new</span> String(<span class="string">"1"</span>);  </span><br><span class="line"> s.intern();  </span><br><span class="line"> String s2 = <span class="string">"1"</span>;  </span><br><span class="line"> System.out.println(s == s2);  </span><br><span class="line">   </span><br><span class="line"> String s3 = <span class="keyword">new</span> String(<span class="string">"1"</span>) + <span class="keyword">new</span> String(<span class="string">"1"</span>);  </span><br><span class="line"> s3.intern();  </span><br><span class="line"> String s4 = <span class="string">"11"</span>;  </span><br><span class="line"> System.out.println(s3 == s4);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>原文中说测试结果是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JDK1.6以及以下：false false  </span><br><span class="line">JDK1.7以及以上：false true</span><br></pre></td></tr></table></figure>
+<p>但是我在本地JDK1.8的环境里都是false，但是如果内容不是”1”的话，如果换成”2”。</p>
+<p>返回的都会是true,这一个问题我一直没有搞懂。</p>
+<p>如果是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">   <span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">internTest1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	   String s = <span class="keyword">new</span> String(<span class="string">"1"</span>);  </span><br><span class="line">	   s.intern();  </span><br><span class="line">	   String s2 = <span class="string">"1"</span>;  </span><br><span class="line">	   System.out.println(s == s2);  </span><br><span class="line"><span class="comment">//	     </span></span><br><span class="line">	   String s3 = <span class="keyword">new</span> String(<span class="string">"2"</span>) + <span class="keyword">new</span> String(<span class="string">"2"</span>);  </span><br><span class="line">	   s3.intern();  </span><br><span class="line">	   String s4 = <span class="string">"22"</span>;  </span><br><span class="line">	   System.out.println(s3 == s4);  </span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>在JDK1.8下就会是false true。</p>
+<p>我们就用这个代码来分析下吧</p>
+<ul>
+<li>JDK1.6及以下</li>
+</ul>
+<ul>
+<li>JDK1.7以上</li>
+</ul>
+<p>String s3 = new String(“2”) + newString(“2”)，这行代码在字符串常量池中生成“2” ，并在堆空间中生成s3引用指向的对象（内容为”22”）。注意此时常量池中是没有 “22”对象的。</p>
+<p>s3.intern()，这一行代码，是将 s3中的“22”字符串放入 String 常量池中，此时常量池中不存在“22”字符串，JDK1.6的做法是直接在常量池中生成一个 “11” 的对象。但是在JDK1.7中，常量池中不需要再存储一份对象了，可以直接存储堆中的引用。这份引用直接指向 s3 引用的对象，也就是说s3.intern() ==s3会返回true。</p>
+<p>String s4 = “22”， 这一行代码会直接去常量池中创建，但是发现已经有这个对象了，此时也就是指向 s3 引用对象的一个引用。因此s3 == s4返回了true。</p>
+<p>啊啊啊，不想写呀，以后在写把。主要是在JDK1.7中，常量池中不需要再存储一份对象了，可以直接存储堆中的引用。这份引用直接指向 s3 引用的对象，也就是说s3.intern() ==s3会返回true。之所以会有区别就是这个造成。</p>
+<h3 id="String的编译优化"><a href="#String的编译优化" class="headerlink" title="String的编译优化"></a>String的编译优化</h3><p>最后再来看下String和final的一个小知识点。</p>
+<p>还是直接上代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stringFinalTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">final</span> String s1=<span class="string">"KO"</span>;</span><br><span class="line">   String s2=s1+<span class="string">"BE"</span>;</span><br><span class="line">   String s3=<span class="string">"KOBE"</span>;</span><br><span class="line">   System.out.println(s2==s3);</span><br><span class="line">   String s4=<span class="string">"KO"</span>;</span><br><span class="line">   String s5=s4+<span class="string">"BE"</span>;</span><br><span class="line">   System.out.println(s3==s5);</span><br><span class="line">   <span class="keyword">final</span> String s6=<span class="keyword">new</span> String(<span class="string">"KO"</span>);</span><br><span class="line">   String s7=s6+<span class="string">"BE"</span>;</span><br><span class="line">   System.out.println(s3==s7);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">true</span><br><span class="line">false</span><br><span class="line">false</span><br></pre></td></tr></table></figure>
+<p>如果只给你代码，你能准确的给出输出结果吗？</p>
+<p>我们来分析下为什么是这样一个结果</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2017/12/13/String/" data-id="cjb527jxh00079cbzbranp6ly" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/13/数组Array/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          数组Array
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/13/Java泛型/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Java泛型</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/12/13/Mybatis中的缓存/">Mybatis中的缓存</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/13/LinkedBlokingQueue/">LinkedBlokingQueue</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/13/WeakHashMap/">WeakHashMap</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/13/CopyOnwriteArrayList/">CopyOnwriteArrayList</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/13/数组Array/">数组Array</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
