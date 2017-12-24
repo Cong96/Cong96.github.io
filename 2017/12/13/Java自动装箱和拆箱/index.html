@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java自动装箱和拆箱 | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言相信大家在写代码的时候，都写过至少看到过这样的代码： 1Integer i=100; 那你写的时候，有没有想过为什么可以直接这样写呢，Integer可是一个对象呀，可不是个基本类型，为什么可以直接写Integer i=100呢？应该是 1Integer i=new Integer(100); 这样才对把。那么到底为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java自动装箱和拆箱">
+<meta property="og:url" content="https://cong96.github.io/2017/12/13/Java自动装箱和拆箱/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言相信大家在写代码的时候，都写过至少看到过这样的代码： 1Integer i=100; 那你写的时候，有没有想过为什么可以直接这样写呢，Integer可是一个对象呀，可不是个基本类型，为什么可以直接写Integer i=100呢？应该是 1Integer i=new Integer(100); 这样才对把。那么到底为什么在Java里面我们允许这样写呢？ 这就涉及到我们今天要探讨的Java自动装">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-24T14:04:24.982Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java自动装箱和拆箱">
+<meta name="twitter:description" content="前言相信大家在写代码的时候，都写过至少看到过这样的代码： 1Integer i=100; 那你写的时候，有没有想过为什么可以直接这样写呢，Integer可是一个对象呀，可不是个基本类型，为什么可以直接写Integer i=100呢？应该是 1Integer i=new Integer(100); 这样才对把。那么到底为什么在Java里面我们允许这样写呢？ 这就涉及到我们今天要探讨的Java自动装">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java自动装箱和拆箱" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/13/Java自动装箱和拆箱/" class="article-date">
+  <time datetime="2017-12-13T12:48:49.206Z" itemprop="datePublished">2017-12-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java自动装箱和拆箱
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>相信大家在写代码的时候，都写过至少看到过这样的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Integer i=<span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+<p>那你写的时候，有没有想过为什么可以直接这样写呢，Integer可是一个对象呀，可不是个基本类型，为什么可以直接写Integer i=100呢？应该是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Integer i=<span class="keyword">new</span> Integer(<span class="number">100</span>);</span><br></pre></td></tr></table></figure>
+<p>这样才对把。那么到底为什么在Java里面我们允许这样写呢？</p>
+<p>这就涉及到我们今天要探讨的Java自动装箱和拆箱了。</p>
+<p>当我们学习完Java自动装箱和拆箱，我们就能很好的把上面的问题解决。</p>
+<p>装箱就是自动将基本数据类型转换为包装器类型；拆箱就是自动将包装器类型转换为基本数据类型。</p>
+<p>##自动拆装箱分析</p>
+<ul>
+<li><p><strong>Example 0</strong></p>
+<p>​</p>
+</li>
+</ul>
+<p>首先，我们还是通过一个例子来分析（JDK1.8）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.wangcc.MyJavaSE.box;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IntegerTest</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> i=<span class="number">125</span>;</span><br><span class="line">		Integer i1=<span class="keyword">new</span> Integer(<span class="number">125</span>);</span><br><span class="line">		Integer i2=Integer.valueOf(<span class="number">125</span>);</span><br><span class="line">	<span class="comment">//	int i2_0=i2.intValue();</span></span><br><span class="line">		<span class="comment">/*Integer i3=125;</span></span><br><span class="line"><span class="comment">		 *系统为我们执行了： </span></span><br><span class="line"><span class="comment">Integer i3 = Integer.valueOf(99); </span></span><br><span class="line"><span class="comment">		 </span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		Integer i3=<span class="number">125</span>;</span><br><span class="line">		<span class="comment">//基本类型和包装类型使用==比较时，包装类型会自动拆箱</span></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * Integer i1=new Integer(125);</span></span><br><span class="line"><span class="comment">		 * int i1_0=i1.intValue();</span></span><br><span class="line"><span class="comment">		 * i==i1_0 ?</span></span><br><span class="line"><span class="comment">		 * */</span></span><br><span class="line">		System.out.println(i==i1); <span class="comment">//(1) true</span></span><br><span class="line">		System.out.println(i==i2); <span class="comment">//(2) true</span></span><br><span class="line">		System.out.println(i==i3); <span class="comment">//(3) true</span></span><br><span class="line">		System.out.println(i1==i2);</span><br><span class="line">		System.out.println(i1==i3);</span><br><span class="line">		System.out.println(i2==i3);</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到执行后的输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">true</span><br><span class="line">true</span><br><span class="line">true</span><br><span class="line">false</span><br><span class="line">false</span><br><span class="line">true</span><br></pre></td></tr></table></figure>
+<p><strong>当基本类型和包装类型使用==比较</strong></p>
+<p>我们先看（1）的输出结果为什么是true</p>
+<p>当i与i1比较的时候，是基本类型与包装类型去比较，这个时候包装类型会自动进行拆箱操作，这部分工作应该是由编译器优化完成的把。（只是个人猜测 javac的功劳）</p>
+<p>相当于会执行如下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> Integer i1=<span class="keyword">new</span> Integer(<span class="number">125</span>);</span><br><span class="line"><span class="keyword">int</span> i1_0=i1.intValue();</span><br><span class="line">i==i1_0  <span class="comment">//最后使用Integer对应的基本类型的值来和基本类型的值直接比较</span></span><br></pre></td></tr></table></figure>
+<p>所以我们会得到true</p>
+<p><strong>当Integer i3=125;和Integer i2=Integer.valueOf(125);比较</strong></p>
+<p>首先我们可以看到结果是true，那为什么是true呢.</p>
+<p>先我们就需要看Integer i3=125;</p>
+<p>为什么可以这样写呢？实际上这应该也是编译器对这行代码进行了自己的优化。相当于我们编写了如下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Integer i3 = Integer.valueOf(<span class="number">125</span>);</span><br></pre></td></tr></table></figure>
+<p>也就是说实际上i2和i3都相当于执行了Integer.valueOf(125)得到的</p>
+<p>为什么两次执行这个方法都得到得到的是同一个Integer对象呢？我们得看下相关源码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">valueOf</span><span class="params">(inti)</span> </span>&#123;    </span><br><span class="line">    <span class="keyword">if</span>(i &gt;= -<span class="number">128</span> &amp;&amp;i &lt;=IntegerCache.high)    </span><br><span class="line">       <span class="comment">//如果i在-128~high之间,就直接在缓存中取出i的Integer类型对象  </span></span><br><span class="line">       <span class="keyword">return</span> IntegerCache.cache[i + <span class="number">128</span>];    </span><br><span class="line">    <span class="keyword">else</span>  </span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">new</span> Integer(i); <span class="comment">//否则就在堆内存中创建   </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IntegerCache</span> </span>&#123;</span><br><span class="line">      <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> low = -<span class="number">128</span>;</span><br><span class="line">      <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> high;</span><br><span class="line">      <span class="keyword">static</span> <span class="keyword">final</span> Integer cache[];</span><br><span class="line"></span><br><span class="line">      <span class="keyword">static</span> &#123;</span><br><span class="line">          <span class="comment">// high value may be configured by property</span></span><br><span class="line">          <span class="keyword">int</span> h = <span class="number">127</span>;<span class="comment">//h值，可以通过设置jdk的AutoBoxCacheMax参数调整</span></span><br><span class="line">          String integerCacheHighPropValue =</span><br><span class="line">              sun.misc.VM.getSavedProperty(<span class="string">"java.lang.Integer.IntegerCache.high"</span>);</span><br><span class="line">          <span class="keyword">if</span> (integerCacheHighPropValue != <span class="keyword">null</span>) &#123;</span><br><span class="line">              <span class="keyword">try</span> &#123;</span><br><span class="line">                  <span class="keyword">int</span> i = parseInt(integerCacheHighPropValue);</span><br><span class="line">               <span class="comment">// 取较大的作为上界，但又不能大于Integer的边界MAX_VALUE  </span></span><br><span class="line"></span><br><span class="line">                  i = Math.max(i, <span class="number">127</span>);<span class="comment">//上界最小为127</span></span><br><span class="line">                  <span class="comment">// Maximum array size is Integer.MAX_VALUE</span></span><br><span class="line">                  h = Math.min(i, Integer.MAX_VALUE - (-low) -<span class="number">1</span>);</span><br><span class="line">              &#125; <span class="keyword">catch</span>( NumberFormatException nfe) &#123;</span><br><span class="line">                  <span class="comment">// If the property cannot be parsed into an int, ignore it.</span></span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          high = h;</span><br><span class="line"></span><br><span class="line">          cache = <span class="keyword">new</span> Integer[(high - low) + <span class="number">1</span>]; <span class="comment">//上界确定，此时high默认一般是127  </span></span><br><span class="line">      <span class="comment">// 创建缓存块，注意缓存数组大小  </span></span><br><span class="line">          <span class="keyword">int</span> j = low;</span><br><span class="line">          <span class="keyword">for</span>(<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; cache.length; k++)</span><br><span class="line">              cache[k] = <span class="keyword">new</span> Integer(j++);<span class="comment">// -128到high值逐一分配到缓存数组  </span></span><br><span class="line"></span><br><span class="line">          <span class="comment">// range [-128, 127] must be interned (JLS7 5.1.7)</span></span><br><span class="line">          <span class="keyword">assert</span> IntegerCache.high &gt;= <span class="number">127</span>;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">private</span> <span class="title">IntegerCache</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>我们将上述代码重要部分都加上了注释，我们特别注意在确定i的取值时，我们标注了i的最小值是127，也就是说</p>
+<p>Integer的缓存至少要覆盖[-128, 127]的范围,那么为什么符合规范的Java实现必须保证Integer的缓存至少要覆盖[-128, 127]的范围</p>
+<p>这个有官方说明：(The Java Language Specification, 3rd Edition)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">If the value p being boxed is true, false, a byte, a char in the range \u0000 to \u007f, or an int or short number between -128 and 127, then let r1 and r2 be the results of any two boxing conversions of p. It is always the case that r1 == r2.</span><br></pre></td></tr></table></figure>
+<p>为了便于理解，我们给出大概的中文意思</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">为了节省内存，对于下列包装对象的两个实例，当它们的基本值相同时，他们总是==：  </span><br><span class="line"> Boolean  </span><br><span class="line"> Byte  </span><br><span class="line"> Character, \u0000 - \u007f(7f是十六进制的127)  </span><br><span class="line"> Integer, -128 — 127</span><br></pre></td></tr></table></figure>
+<p>好吧，我还是没理解上面那段英文的意思。</p>
+<p>这里给出除了Integer之外的其他类型的自动装箱池</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Boolean：(全部缓存)</span><br><span class="line">Byte：(全部缓存 -128 — 127)</span><br><span class="line"></span><br><span class="line">Character(0-127缓存)</span><br><span class="line">Short(-128 — 127缓存)</span><br><span class="line">Long(-128 — 127缓存)</span><br><span class="line"></span><br><span class="line">Float(没有缓存)</span><br><span class="line">Doulbe(没有缓存)</span><br></pre></td></tr></table></figure>
+<p><strong>为什么Float和Double没有缓存呢，其实很简单，因为在一定的范围呢，整型的个数是可以确定的，所以可以指定一个缓存数组，但是在一定的范围内，浮点型的个数是无法确定的，所以，没法指定一个缓存数组。</strong></p>
+<p>上面一开始有说过，我们可以通过设置VM虚拟机参数来动态的改变Integer缓存区间大小。通过设置</p>
+<p>-XX:AutoBoxCacheMax=NNN参数即可将Integer的自动缓存区间设置为[-128,NNN]。这个参数是server模式专有的。</p>
+<p>首先你要确认你的Java服务运行所用到的jdk的默认运行模式是多少，使用javac -version参看，我本机安装的JDK8默认就是Server 模式。</p>
+<p>如果你默认的是Client模式的话，你就需要作出一些调整了，找到你所安装jdk的地方，进入到jdk/jre/bin目录，然后搜索jvm.cfg文件，修改文件，将Server Client两行顺序做一个前后调整就好。</p>
+<p>扯得有点多了，从上面我们可以得知：</p>
+<p>当使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Integer i=Integer.valueOf(x);</span><br></pre></td></tr></table></figure>
+<p>当x在-128~127之间的时候，我们得到的Integer对象是缓存IntegerCache中的对象（默认没有修改相关参数的情况下），所以当多次调用这个方法的时候，返回的都是同一对象，而当x的值不在这个范围的时候，多次调用就会多次创建新的Integer对象了。</p>
+<ul>
+<li><p><strong>Example 1</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUnboxing</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	Integer num1 = <span class="number">100</span>;</span><br><span class="line">	Integer num2 = <span class="number">200</span>;</span><br><span class="line">	Long num3 = <span class="number">300l</span>;</span><br><span class="line">	System.out.println(num3 == (num1 + num2));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当你第一眼看到这个代码的时候，你会给出怎样的答案呢？</p>
+<p>true还是false？</p>
+<p>答案是true。如果是单纯的Integer对象和Long类型的对象使用==比较，很显然是无法通过编译的。</p>
+<p>因为不是同一类型，那么如果是使用equals()这种不比较引用的呢？也是false，还是因为是不同类型。</p>
+<p>如果是上述的情况使用==比较。如果在比较的过程中有对某个包装类型进行了+ - * / 等操作时，会自动的进行拆箱操作，最终会比较两端的数值大小。</p>
+<p>当 “==”运算符的两个操作数都是 包装器类型的引用，则是比较指向的是否是同一个对象，而如果其中有一个操作数是表达式（即包含算术运算）则比较的是数值（即会触发自动拆箱的过程）。</p>
+</li>
+</ul>
+<p>###总结</p>
+<p>   Java使用自动装箱和拆箱机制，节省了常用数值的内存开销和创建对象的开销，提高了效率。通过上面的研究和测试，结论如下：</p>
+<p>​        （1）Integer和 int之间可以进行各种比较；Integer对象将自动拆箱后与int值比较</p>
+<p>​        （2）两个Integer对象之间也可以用&gt;、&lt;等符号比较大小；两个Integer对象都拆箱后，再比较大小</p>
+<p>​        （3） 两个Integer对象最好不要用==比较。因为：-128~127范围(一般是这个范围)内是取缓存内对象用，所以相等，该范围外是两个不同对象引用比较，所以不等。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2017/12/13/Java自动装箱和拆箱/" data-id="cjbkujwuc0000ocbziw7iytrk" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/13/Java泛型/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Java泛型
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/02/Vector/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Vector</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/12/24/--Tomcat是如何处理web.xml的（下）/">Tomcat是如何处理web.xml的（下）</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何处理server.xml的/">Tomcat是如何加载server.xml的</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何处理web.xml的/">Tomcat是如何处理web.xml的</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何处理请求的/">Tomcat是如何处理请求的</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何接受请求的/">Tomcat Connector节点</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
