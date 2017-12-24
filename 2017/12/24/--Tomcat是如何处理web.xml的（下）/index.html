@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Tomcat是如何处理web.xml的（下） | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言上一篇说了那么多，可惜还是只讲完StandardEngine部分，接下来要进入StandardHost和StandardContext了。 我们进入到StandardHost的startInternal()方法后，发现和StandardEngine的套路是一样的，都是调用了ContianerBase的startIn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat是如何处理web.xml的（下）">
+<meta property="og:url" content="https://cong96.github.io/2017/12/24/--Tomcat是如何处理web.xml的（下）/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言上一篇说了那么多，可惜还是只讲完StandardEngine部分，接下来要进入StandardHost和StandardContext了。 我们进入到StandardHost的startInternal()方法后，发现和StandardEngine的套路是一样的，都是调用了ContianerBase的startInternal()方法，自己并没有做什么工作，所以就不需要过多的说明了，直接看他">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-23T21:44:13.396Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat是如何处理web.xml的（下）">
+<meta name="twitter:description" content="前言上一篇说了那么多，可惜还是只讲完StandardEngine部分，接下来要进入StandardHost和StandardContext了。 我们进入到StandardHost的startInternal()方法后，发现和StandardEngine的套路是一样的，都是调用了ContianerBase的startInternal()方法，自己并没有做什么工作，所以就不需要过多的说明了，直接看他">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post---Tomcat是如何处理web.xml的（下）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/24/--Tomcat是如何处理web.xml的（下）/" class="article-date">
+  <time datetime="2017-12-24T13:56:35.271Z" itemprop="datePublished">2017-12-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java-WEB/">Java WEB</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Tomcat是如何处理web.xml的（下）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>上一篇说了那么多，可惜还是只讲完StandardEngine部分，接下来要进入StandardHost和StandardContext了。</p>
+<p>我们进入到StandardHost的startInternal()方法后，发现和StandardEngine的套路是一样的，都是调用了ContianerBase的startInternal()方法，自己并没有做什么工作，所以就不需要过多的说明了，直接看他的子容器的StandardContext的startInternal()方法</p>
+<h3 id="StandardContext"><a href="#StandardContext" class="headerlink" title="StandardContext"></a>StandardContext</h3><p><strong>startInternal()</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//这个方法巨长，但是我们需要关注的就这一行</span></span><br><span class="line">fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, <span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+<p>很明显这里是个触发监听器的动作，在上一篇已经分析了，直接来看这个监听器ContextConfig的lifecycleEvent方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line"> public void lifecycleEvent(LifecycleEvent event) &#123;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">     // Process the event that has occurred</span><br><span class="line">     if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) &#123;</span><br><span class="line">         configureStart();</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+<p> configureStart();就是用来解析web.xml的，我们进去看看</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">configureStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line"> 	<span class="comment">//...巨长</span></span><br><span class="line"><span class="comment">//这个方法就是用来解析web.xml的方法</span></span><br><span class="line">       webConfig();</span><br><span class="line"></span><br><span class="line">      </span><br><span class="line">   &#125;</span><br><span class="line">     <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">webConfig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        * Anything and everything can override the global and host defaults.</span></span><br><span class="line"><span class="comment">        * This is implemented in two parts</span></span><br><span class="line"><span class="comment">        * - Handle as a web fragment that gets added after everything else so</span></span><br><span class="line"><span class="comment">        *   everything else takes priority</span></span><br><span class="line"><span class="comment">        * - Mark Servlets as overridable so SCI configuration can replace</span></span><br><span class="line"><span class="comment">        *   configuration from the defaults</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line"></span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">        * The rules for annotation scanning are not as clear-cut as one might</span></span><br><span class="line"><span class="comment">        * think. Tomcat implements the following process:</span></span><br><span class="line"><span class="comment">        * - As per SRV.1.6.2, Tomcat will scan for annotations regardless of</span></span><br><span class="line"><span class="comment">        *   which Servlet spec version is declared in web.xml. The EG has</span></span><br><span class="line"><span class="comment">        *   confirmed this is the expected behaviour.</span></span><br><span class="line"><span class="comment">        * - As per http://java.net/jira/browse/SERVLET_SPEC-36, if the main</span></span><br><span class="line"><span class="comment">        *   web.xml is marked as metadata-complete, JARs are still processed</span></span><br><span class="line"><span class="comment">        *   for SCIs.</span></span><br><span class="line"><span class="comment">        * - If metadata-complete=true and an absolute ordering is specified,</span></span><br><span class="line"><span class="comment">        *   JARs excluded from the ordering are also excluded from the SCI</span></span><br><span class="line"><span class="comment">        *   processing.</span></span><br><span class="line"><span class="comment">        * - If an SCI has a @HandlesType annotation then all classes (except</span></span><br><span class="line"><span class="comment">        *   those in JARs excluded from an absolute ordering) need to be</span></span><br><span class="line"><span class="comment">        *   scanned to check if they match.</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">       Set&lt;WebXml&gt; defaults = <span class="keyword">new</span> HashSet&lt;WebXml&gt;();</span><br><span class="line">       defaults.add(getDefaultWebXmlFragment());</span><br><span class="line"><span class="comment">//创建WebXml类，解析web.xml对应的Java类</span></span><br><span class="line">       WebXml webXml = createWebXml();</span><br><span class="line"></span><br><span class="line">       <span class="comment">// Parse context level web.xml</span></span><br><span class="line">       <span class="comment">//加载得到web.xml</span></span><br><span class="line">       InputSource contextWebXml = getContextWebXmlSource();</span><br><span class="line">       <span class="comment">//解析</span></span><br><span class="line">       parseWebXml(contextWebXml, webXml, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//STEP1-STEP8 在其他地方 如jar包等地方的信息加入到WebXML类中</span></span><br><span class="line"></span><br><span class="line">           <span class="comment">// Step 9. Apply merged web.xml to Context</span></span><br><span class="line">           <span class="keyword">if</span> (ok) &#123;</span><br><span class="line">               webXml.configureContext(context);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           webXml.merge(defaults);</span><br><span class="line">           convertJsps(webXml);</span><br><span class="line">           webXml.configureContext(context);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// Step 9a. Make the merged web.xml available to other</span></span><br><span class="line">       <span class="comment">// components, specifically Jasper, to save those components</span></span><br><span class="line">       <span class="comment">// from having to re-generate it.</span></span><br><span class="line">       <span class="comment">// TODO Use a ServletContainerInitializer for Jasper</span></span><br><span class="line">       String mergedWebXml = webXml.toXml();</span><br><span class="line">       sContext.setAttribute(</span><br><span class="line">              org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,</span><br><span class="line">              mergedWebXml);</span><br><span class="line">       <span class="keyword">if</span> (context.getLogEffectiveWebXml()) &#123;</span><br><span class="line">           log.info(<span class="string">"web.xml:\n"</span> + mergedWebXml);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// Always need to look for static resources</span></span><br><span class="line">       <span class="comment">// Step 10. Look for static resources packaged in JARs</span></span><br><span class="line">       <span class="keyword">if</span> (ok) &#123;</span><br><span class="line">           <span class="comment">// Spec does not define an order.</span></span><br><span class="line">           <span class="comment">// Use ordered JARs followed by remaining JARs</span></span><br><span class="line">           Set&lt;WebXml&gt; resourceJars = <span class="keyword">new</span> LinkedHashSet&lt;WebXml&gt;();</span><br><span class="line">           <span class="keyword">for</span> (WebXml fragment : orderedFragments) &#123;</span><br><span class="line">               resourceJars.add(fragment);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">for</span> (WebXml fragment : fragments.values()) &#123;</span><br><span class="line">               <span class="keyword">if</span> (!resourceJars.contains(fragment)) &#123;</span><br><span class="line">                   resourceJars.add(fragment);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           processResourceJARs(resourceJars);</span><br><span class="line">           <span class="comment">// See also StandardContext.resourcesStart() for</span></span><br><span class="line">           <span class="comment">// WEB-INF/classes/META-INF/resources configuration</span></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// Step 11. Apply the ServletContainerInitializer config to the</span></span><br><span class="line">       <span class="comment">// context</span></span><br><span class="line">       <span class="keyword">if</span> (ok) &#123;</span><br><span class="line">           <span class="keyword">for</span> (Map.Entry&lt;ServletContainerInitializer,</span><br><span class="line">                   Set&lt;Class&lt;?&gt;&gt;&gt; entry :</span><br><span class="line">                       initializerClassMap.entrySet()) &#123;</span><br><span class="line">               <span class="keyword">if</span> (entry.getValue().isEmpty()) &#123;</span><br><span class="line">                   context.addServletContainerInitializer(</span><br><span class="line">                           entry.getKey(), <span class="keyword">null</span>);</span><br><span class="line">               &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                   context.addServletContainerInitializer(</span><br><span class="line">                           entry.getKey(), entry.getValue());</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法的作用，先是解析web.xml，接着收集其他地方的配置信息汇总到WebXML这个类中，然后调用STEP9中的  webXml.configureContext(context);方法将web.xml的配置信息注入到StandardContext,这就是Tomcat对web.xml的处理</p>
+<p>我们先来看看解析web.xml的相关操作</p>
+<p><strong>parseWebXml()</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">protected void parseWebXml(InputSource source, WebXml dest,</span><br><span class="line">        boolean fragment) &#123;</span><br><span class="line"></span><br><span class="line">    if (source == null) return;</span><br><span class="line"></span><br><span class="line">    XmlErrorHandler handler = new XmlErrorHandler();</span><br><span class="line"></span><br><span class="line">    Digester digester;</span><br><span class="line">    WebRuleSet ruleSet;</span><br><span class="line">    if (fragment) &#123;</span><br><span class="line">        digester = webFragmentDigester;</span><br><span class="line">        ruleSet = webFragmentRuleSet;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        digester = webDigester;</span><br><span class="line">        ruleSet = webRuleSet;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    digester.push(dest);</span><br><span class="line">    digester.setErrorHandler(handler);</span><br><span class="line"></span><br><span class="line">    if(log.isDebugEnabled()) &#123;</span><br><span class="line">        log.debug(sm.getString(&quot;contextConfig.applicationStart&quot;,</span><br><span class="line">                source.getSystemId()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    try &#123;</span><br><span class="line">        digester.parse(source);</span><br><span class="line"></span><br><span class="line">        if (handler.getWarnings().size() &gt; 0 ||</span><br><span class="line">                handler.getErrors().size() &gt; 0) &#123;</span><br><span class="line">            ok = false;</span><br><span class="line">            handler.logFindings(log, source.getSystemId());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (SAXParseException e) &#123;</span><br><span class="line">        log.error(sm.getString(&quot;contextConfig.applicationParse&quot;,</span><br><span class="line">                source.getSystemId()), e);</span><br><span class="line">        log.error(sm.getString(&quot;contextConfig.applicationPosition&quot;,</span><br><span class="line">                         &quot;&quot; + e.getLineNumber(),</span><br><span class="line">                         &quot;&quot; + e.getColumnNumber()));</span><br><span class="line">        ok = false;</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">        log.error(sm.getString(&quot;contextConfig.applicationParse&quot;,</span><br><span class="line">                source.getSystemId()), e);</span><br><span class="line">        ok = false;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        digester.reset();</span><br><span class="line">        ruleSet.recycle();</span><br><span class="line">        InputSourceUtil.close(source);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意看WebRuleSet的addRuleInstances</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line"> public void addRuleInstances(Digester digester) &#123;</span><br><span class="line">   digester.addCallMethod(fullPrefix + &quot;/context-param&quot;,</span><br><span class="line">                            &quot;addContextParam&quot;, 2);</span><br><span class="line">     digester.addCallParam(fullPrefix + &quot;/context-param/param-name&quot;, 0);</span><br><span class="line">     digester.addCallParam(fullPrefix + &quot;/context-param/param-value&quot;, 1);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/display-name&quot;,</span><br><span class="line">                            &quot;setDisplayName&quot;, 0);</span><br><span class="line"></span><br><span class="line">     digester.addRule(fullPrefix + &quot;/distributable&quot;,</span><br><span class="line">                      new SetDistributableRule());</span><br><span class="line"></span><br><span class="line">     configureNamingRules(digester);</span><br><span class="line"></span><br><span class="line">     digester.addObjectCreate(fullPrefix + &quot;/error-page&quot;,</span><br><span class="line">                              &quot;org.apache.catalina.deploy.ErrorPage&quot;);</span><br><span class="line">     digester.addSetNext(fullPrefix + &quot;/error-page&quot;,</span><br><span class="line">                         &quot;addErrorPage&quot;,</span><br><span class="line">                         &quot;org.apache.catalina.deploy.ErrorPage&quot;);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/error-page/error-code&quot;,</span><br><span class="line">                            &quot;setErrorCode&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/error-page/exception-type&quot;,</span><br><span class="line">                            &quot;setExceptionType&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/error-page/location&quot;,</span><br><span class="line">                            &quot;setLocation&quot;, 0);</span><br><span class="line"></span><br><span class="line">     digester.addObjectCreate(fullPrefix + &quot;/filter&quot;,</span><br><span class="line">                              &quot;org.apache.catalina.deploy.FilterDef&quot;);</span><br><span class="line">     digester.addSetNext(fullPrefix + &quot;/filter&quot;,</span><br><span class="line">                         &quot;addFilter&quot;,</span><br><span class="line">                         &quot;org.apache.catalina.deploy.FilterDef&quot;);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/description&quot;,</span><br><span class="line">                            &quot;setDescription&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/display-name&quot;,</span><br><span class="line">                            &quot;setDisplayName&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/filter-class&quot;,</span><br><span class="line">                            &quot;setFilterClass&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/filter-name&quot;,</span><br><span class="line">                            &quot;setFilterName&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/icon/large-icon&quot;,</span><br><span class="line">                            &quot;setLargeIcon&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/icon/small-icon&quot;,</span><br><span class="line">                            &quot;setSmallIcon&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/async-supported&quot;,</span><br><span class="line">             &quot;setAsyncSupported&quot;, 0);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter/init-param&quot;,</span><br><span class="line">                            &quot;addInitParameter&quot;, 2);</span><br><span class="line">     digester.addCallParam(fullPrefix + &quot;/filter/init-param/param-name&quot;,</span><br><span class="line">                           0);</span><br><span class="line">     digester.addCallParam(fullPrefix + &quot;/filter/init-param/param-value&quot;,</span><br><span class="line">                           1);</span><br><span class="line"></span><br><span class="line">     digester.addObjectCreate(fullPrefix + &quot;/filter-mapping&quot;,</span><br><span class="line">                              &quot;org.apache.catalina.deploy.FilterMap&quot;);</span><br><span class="line">     digester.addSetNext(fullPrefix + &quot;/filter-mapping&quot;,</span><br><span class="line">                              &quot;addFilterMapping&quot;,</span><br><span class="line">                              &quot;org.apache.catalina.deploy.FilterMap&quot;);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter-mapping/filter-name&quot;,</span><br><span class="line">                            &quot;setFilterName&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter-mapping/servlet-name&quot;,</span><br><span class="line">                            &quot;addServletName&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter-mapping/url-pattern&quot;,</span><br><span class="line">                            &quot;addURLPattern&quot;, 0);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/filter-mapping/dispatcher&quot;,</span><br><span class="line">                            &quot;setDispatcher&quot;, 0);</span><br><span class="line"></span><br><span class="line">      digester.addCallMethod(fullPrefix + &quot;/listener/listener-class&quot;,</span><br><span class="line">                             &quot;addListener&quot;, 0);</span><br><span class="line">  digester.addRule(fullPrefix + &quot;/servlet&quot;,</span><br><span class="line">                      new ServletDefCreateRule());</span><br><span class="line">     digester.addSetNext(fullPrefix + &quot;/servlet&quot;,</span><br><span class="line">                         &quot;addServlet&quot;,</span><br><span class="line">                         &quot;org.apache.catalina.deploy.ServletDef&quot;);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/init-param&quot;,</span><br><span class="line">                            &quot;addInitParameter&quot;, 2);</span><br><span class="line">     digester.addCallParam(fullPrefix + &quot;/servlet/init-param/param-name&quot;,</span><br><span class="line">                           0);</span><br><span class="line">     digester.addCallParam(fullPrefix + &quot;/servlet/init-param/param-value&quot;,</span><br><span class="line">                           1);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/jsp-file&quot;,</span><br><span class="line">                            &quot;setJspFile&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/load-on-startup&quot;,</span><br><span class="line">                            &quot;setLoadOnStartup&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/run-as/role-name&quot;,</span><br><span class="line">                            &quot;setRunAs&quot;, 0);</span><br><span class="line"></span><br><span class="line">     digester.addObjectCreate(fullPrefix + &quot;/servlet/security-role-ref&quot;,</span><br><span class="line">                              &quot;org.apache.catalina.deploy.SecurityRoleRef&quot;);</span><br><span class="line">     digester.addSetNext(fullPrefix + &quot;/servlet/security-role-ref&quot;,</span><br><span class="line">                         &quot;addSecurityRoleRef&quot;,</span><br><span class="line">                         &quot;org.apache.catalina.deploy.SecurityRoleRef&quot;);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/security-role-ref/role-link&quot;,</span><br><span class="line">                            &quot;setLink&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/security-role-ref/role-name&quot;,</span><br><span class="line">                            &quot;setName&quot;, 0);</span><br><span class="line"></span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/servlet-class&quot;,</span><br><span class="line">                           &quot;setServletClass&quot;, 0);</span><br><span class="line">     digester.addCallMethod(fullPrefix + &quot;/servlet/servlet-name&quot;,</span><br><span class="line">                           &quot;setServletName&quot;, 0);</span><br><span class="line">     </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>这里给出了web.xml元素与WebXML这个Java类的对应规则。</p>
+<p>看完解析web.xml后，我们再来看是怎么注入到StandardContext中的</p>
+<p><strong>configureContext</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"> configureContext(StandardContext context)&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"><span class="keyword">for</span> (ServletDef servlet : servlets.values()) &#123;</span><br><span class="line">            Wrapper wrapper = context.createWrapper();</span><br><span class="line">            <span class="comment">// Description is ignored</span></span><br><span class="line">            <span class="comment">// Display name is ignored</span></span><br><span class="line">            <span class="comment">// Icons are ignored</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// jsp-file gets passed to the JSP Servlet as an init-param</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (servlet.getLoadOnStartup() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                wrapper.setLoadOnStartup(servlet.getLoadOnStartup().intValue());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (servlet.getEnabled() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                wrapper.setEnabled(servlet.getEnabled().booleanValue());</span><br><span class="line">            &#125;</span><br><span class="line">            wrapper.setName(servlet.getServletName());</span><br><span class="line">            Map&lt;String,String&gt; params = servlet.getParameterMap();</span><br><span class="line">            <span class="keyword">for</span> (Entry&lt;String, String&gt; entry : params.entrySet()) &#123;</span><br><span class="line">                wrapper.addInitParameter(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">            wrapper.setRunAs(servlet.getRunAs());</span><br><span class="line">            Set&lt;SecurityRoleRef&gt; roleRefs = servlet.getSecurityRoleRefs();</span><br><span class="line">            <span class="keyword">for</span> (SecurityRoleRef roleRef : roleRefs) &#123;</span><br><span class="line">                wrapper.addSecurityReference(</span><br><span class="line">                        roleRef.getName(), roleRef.getLink());</span><br><span class="line">            &#125;</span><br><span class="line">            wrapper.setServletClass(servlet.getServletClass());</span><br><span class="line">            MultipartDef multipartdef = servlet.getMultipartDef();</span><br><span class="line">            <span class="keyword">if</span> (multipartdef != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (multipartdef.getMaxFileSize() != <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                        multipartdef.getMaxRequestSize()!= <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">                        multipartdef.getFileSizeThreshold() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    wrapper.setMultipartConfigElement(<span class="keyword">new</span> MultipartConfigElement(</span><br><span class="line">                            multipartdef.getLocation(),</span><br><span class="line">                            Long.parseLong(multipartdef.getMaxFileSize()),</span><br><span class="line">                            Long.parseLong(multipartdef.getMaxRequestSize()),</span><br><span class="line">                            Integer.parseInt(</span><br><span class="line">                                    multipartdef.getFileSizeThreshold())));</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    wrapper.setMultipartConfigElement(<span class="keyword">new</span> MultipartConfigElement(</span><br><span class="line">                            multipartdef.getLocation()));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (servlet.getAsyncSupported() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                wrapper.setAsyncSupported(</span><br><span class="line">                        servlet.getAsyncSupported().booleanValue());</span><br><span class="line">            &#125;</span><br><span class="line">            wrapper.setOverridable(servlet.isOverridable());</span><br><span class="line">            context.addChild(wrapper);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Entry&lt;String, String&gt; entry : servletMappings.entrySet()) &#123;</span><br><span class="line">            context.addServletMapping(entry.getKey(), entry.getValue());</span><br><span class="line">        &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在这个方法里有对监听器，过滤器，Servlet以及其他配置元素的注入方法，这里我们先只关注Servlet的注入情况，之后讲到Tomcat处理请求的时候会回过头来说过滤器。</p>
+<p>我们看上述代码所做的工作：</p>
+<p>将web.xml给出的servlet配置信息全部包装到StandardWarpper,并且将所有的Servlet都设置成StandardContext的子容器，这一点很重要。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2017/12/24/--Tomcat是如何处理web.xml的（下）/" data-id="cjbkuc3490000kkbzmcsygjaw" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/12/24/Tomcat是如何处理server.xml的/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Tomcat是如何加载server.xml的</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/12/24/--Tomcat是如何处理web.xml的（下）/">Tomcat是如何处理web.xml的（下）</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何处理server.xml的/">Tomcat是如何加载server.xml的</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何处理web.xml的/">Tomcat是如何处理web.xml的</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何处理请求的/">Tomcat是如何处理请求的</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/Tomcat是如何接受请求的/">Tomcat Connector节点</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
