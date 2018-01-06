@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>SpringMVC配置文件的解析(二) | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言上一篇我们已经将配置文件中的bean节点的注册化和实例化讲解了。接下来我们来看下下面这种扩展节点是什么解析的。 1&amp;lt;context:component-scan base-pacakge=&quot;&quot;  /&amp;gt; 在Spring的配置节点中分为两种，一种就是bean，import">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC配置文件的解析(二)">
+<meta property="og:url" content="https://cong96.github.io/2018/01/07/--SpringMVC配置文件的解析(二)/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言上一篇我们已经将配置文件中的bean节点的注册化和实例化讲解了。接下来我们来看下下面这种扩展节点是什么解析的。 1&amp;lt;context:component-scan base-pacakge=&quot;&quot;  /&amp;gt; 在Spring的配置节点中分为两种，一种就是bean，import这种的原生节点（个人臆造），另一种就是上面举例的这种扩展节点。还记得我们讲解解析bean节点的代码吗。 将目光投向">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-06T13:33:22.773Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringMVC配置文件的解析(二)">
+<meta name="twitter:description" content="前言上一篇我们已经将配置文件中的bean节点的注册化和实例化讲解了。接下来我们来看下下面这种扩展节点是什么解析的。 1&amp;lt;context:component-scan base-pacakge=&quot;&quot;  /&amp;gt; 在Spring的配置节点中分为两种，一种就是bean，import这种的原生节点（个人臆造），另一种就是上面举例的这种扩展节点。还记得我们讲解解析bean节点的代码吗。 将目光投向">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post---SpringMVC配置文件的解析(二)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/07/--SpringMVC配置文件的解析(二)/" class="article-date">
+  <time datetime="2018-01-06T18:59:09.977Z" itemprop="datePublished">2018-01-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/SpringMVC/">SpringMVC</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      SpringMVC配置文件的解析(二)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>上一篇我们已经将配置文件中的bean节点的注册化和实例化讲解了。接下来我们来看下下面这种扩展节点是什么解析的。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-pacakge</span>=<span class="string">""</span>  /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在Spring的配置节点中分为两种，一种就是bean，import这种的原生节点（个人臆造），另一种就是上面举例的这种扩展节点。还记得我们讲解解析bean节点的代码吗。</p>
+<p>将目光投向</p>
+<p>DefaultBeanDefinitionDocumentReader的parseBeanDefinitions(root, this.delegate);方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">parseBeanDefinitions</span><span class="params">(Element root, BeanDefinitionParserDelegate delegate)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (delegate.isDefaultNamespace(root)) &#123;</span><br><span class="line">		NodeList nl = root.getChildNodes();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nl.getLength(); i++) &#123;</span><br><span class="line">			Node node = nl.item(i);</span><br><span class="line">			<span class="keyword">if</span> (node <span class="keyword">instanceof</span> Element) &#123;</span><br><span class="line">				Element ele = (Element) node;</span><br><span class="line">				<span class="keyword">if</span> (delegate.isDefaultNamespace(ele)) &#123;</span><br><span class="line">				<span class="comment">//解析原生节点，bean import等</span></span><br><span class="line">                     parseDefaultElement(ele, delegate);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">else</span> &#123;</span><br><span class="line">                     <span class="comment">//解析拓展节点</span></span><br><span class="line">					delegate.parseCustomElement(ele);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		delegate.parseCustomElement(root);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码并不难理解，就是解析节点，我们分析bean的解析注册时，走的是                  parseDefaultElement(ele, delegate);</p>
+<p>那么到了拓展节点，自然就是走                    delegate.parseCustomElement(ele);了。</p>
+<p>我们就以这个方法为切入点来分析。</p>
+<h3 id="节点的解析"><a href="#节点的解析" class="headerlink" title="\节点的解析"></a>\<context:component-scan base-pacakge="">节点的解析</context:component-scan></h3><p>delegate.parseCustomElement(ele);</p>
+<p>这里的delegate是一个BeanDefinitionParserDelegate实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> BeanDefinition <span class="title">parseCustomElement</span><span class="params">(Element ele)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> parseCustomElement(ele, <span class="keyword">null</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> BeanDefinition <span class="title">parseCustomElement</span><span class="params">(Element ele, BeanDefinition containingBd)</span> </span>&#123;</span><br><span class="line">		String namespaceUri = getNamespaceURI(ele);</span><br><span class="line">      <span class="comment">//得到handler</span></span><br><span class="line">		NamespaceHandler handler = <span class="keyword">this</span>.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);</span><br><span class="line">		<span class="keyword">if</span> (handler == <span class="keyword">null</span>) &#123;</span><br><span class="line">			error(<span class="string">"Unable to locate Spring NamespaceHandler for XML schema namespace ["</span> + namespaceUri + <span class="string">"]"</span>, ele);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> handler.parse(ele, <span class="keyword">new</span> ParserContext(<span class="keyword">this</span>.readerContext, <span class="keyword">this</span>, containingBd));</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法代码行数很少：</p>
+<p>1.先得到NamespaceHandler实例</p>
+<p>2.使用这个实例来解析扩展元素。</p>
+<p>我们先看我们这个要得到的NamespaceHandler实例</p>
+<p> NamespaceHandler在这里到底起到了什么作用，这个实例又是根据什么得来的呢？           </p>
+<p>首先通过Element的NameSpace得到相应的命名空间。（这个属于XML的知识啦）</p>
+<p>然后根据不同的Namespace获取对应的NamespaceHandler，这个是怎么匹配上的呢，是因为我们在Beans标签配置了命名空间，然后就可以配置对应的标签，解析标签时，我们就有相应命名空间所对应的NamespaceHandler来解析。</p>
+<p>我们回想下我们编写Spring的配置文件时，都需要在Beans标签上配置命名空间。比如我们的配置文件就有如下配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="attr">xmlns:p</span>=<span class="string">"http://www.springframework.org/schema/p"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/context</span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/context/spring-context-3.0.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/mvc</span></span></span><br><span class="line"><span class="tag"><span class="string">           http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd"</span> <span class="attr">default-autowire</span>=<span class="string">"byName"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>其中我们就看到有context标签。这个就对应了ContextNamespaceHandler。</p>
+<p>这个ContextNamespaceHandler是NamespaceHandlerSupport的直接子类（NamespaceHandlerSupport直接实现了NamespaceHandler接口）。我们捎带手的来看下这个类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ContextNamespaceHandler</span> <span class="keyword">extends</span> <span class="title">NamespaceHandlerSupport</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"property-placeholder"</span>, <span class="keyword">new</span> PropertyPlaceholderBeanDefinitionParser());</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"property-override"</span>, <span class="keyword">new</span> PropertyOverrideBeanDefinitionParser());</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"annotation-config"</span>, <span class="keyword">new</span> AnnotationConfigBeanDefinitionParser());</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"component-scan"</span>, <span class="keyword">new</span> ComponentScanBeanDefinitionParser());</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"load-time-weaver"</span>, <span class="keyword">new</span> LoadTimeWeaverBeanDefinitionParser());</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"spring-configured"</span>, <span class="keyword">new</span> SpringConfiguredBeanDefinitionParser());</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"mbean-export"</span>, <span class="keyword">new</span> MBeanExportBeanDefinitionParser());</span><br><span class="line">		registerBeanDefinitionParser(<span class="string">"mbean-server"</span>, <span class="keyword">new</span> MBeanServerBeanDefinitionParser());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们看到这个类就是注册了一些BeanDefinitionParser，其中就包括\<context:component-scan>节点对应的ComponentScanBeanDefinitionParser()</context:component-scan></p>
+<p>以\<context:component-scan>节点为例，我们已经在第一步里得到了ContextNamespaceHandler实例。</context:component-scan></p>
+<p>接下来便来到第二步，去调用handler.parse()方法。</p>
+<p>这个方法很明显具体实现是在NamespaceHandlerSupport类中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> BeanDefinition <span class="title">parse</span><span class="params">(Element element, ParserContext parserContext)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> findParserForElement(element, parserContext).parse(element, parserContext);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> BeanDefinitionParser <span class="title">findParserForElement</span><span class="params">(Element element, ParserContext parserContext)</span> </span>&#123;</span><br><span class="line">	String localName = parserContext.getDelegate().getLocalName(element);</span><br><span class="line">	BeanDefinitionParser parser = <span class="keyword">this</span>.parsers.get(localName);</span><br><span class="line">	<span class="keyword">if</span> (parser == <span class="keyword">null</span>) &#123;</span><br><span class="line">		parserContext.getReaderContext().fatal(</span><br><span class="line">				<span class="string">"Cannot locate BeanDefinitionParser for element ["</span> + localName + <span class="string">"]"</span>, element);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> parser;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们通过findParserForElement来找到对应的BeanDefinitionParser,很显然这里是ComponentScanBeanDefinitionParser实例，这个实例的注入时机已经在上面说明了。</p>
+<p>然后再调用ComponentScanBeanDefinitionParser的parse(element, parserContext);方法来进行解析。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> BeanDefinition <span class="title">parse</span><span class="params">(Element element, ParserContext parserContext)</span> </span>&#123;</span><br><span class="line">		String basePackage = element.getAttribute(BASE_PACKAGE_ATTRIBUTE);</span><br><span class="line">		basePackage = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(basePackage);</span><br><span class="line">      <span class="comment">//先得到basepacakge,可能有多个</span></span><br><span class="line">		String[] basePackages = StringUtils.tokenizeToStringArray(basePackage,</span><br><span class="line">				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Actually scan for bean definitions and register them.</span></span><br><span class="line">		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);</span><br><span class="line">		Set&lt;BeanDefinitionHolder&gt; beanDefinitions = scanner.doScan(basePackages);</span><br><span class="line">		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>还记得我们首次使用\<context:component-scan>节点的时候，文档告诉我们这个节点的作用吗？</context:component-scan></p>
+<p>使用这个节点的标配是指定他的base-package=”xxxx”这个属性。一旦指定了这个base-package就意味着这个包下面的所有类都会被扫描，然后会将带有@Component,@Controller,@Service,@Respository的类都会被注册到Spring容器中，而这个功能的实现就是靠的上面的这个方法。这里多说一句，@Component是通用注解，而后面的三个注解是子注解，将各种功能的Bean分类，不信你去看这几个注解的源码，你会发现，后面的三个注解都被@Component标注了。</p>
+<p>我们来分析一下这个方法。</p>
+<p>   （1）获取context:component-scan 配置的属性base-package的值，然后放到数组。</p>
+<pre><code>（2）创建扫描对应包下的class和jar文件的对象ClassPathBeanDefinitionScanner ，由这个类来实现扫描包下的class和jar文件并把注解的Bean包装成BeanDefinition。
+
+（3）BeanDefinition注册到Bean工厂。
+</code></pre><p> 其中扫描的操作是由ClassPathBeanDefinitionScanner的doScan方法完成的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Set&lt;BeanDefinitionHolder&gt; <span class="title">doScan</span><span class="params">(String... basePackages)</span> </span>&#123;</span><br><span class="line">	Assert.notEmpty(basePackages, <span class="string">"At least one base package must be specified"</span>);</span><br><span class="line">     <span class="comment">//在这里终于看到了我们很熟悉的BeanDefinitionHolder了，这里新建了一个Set集合，为什么是Set，不允许重复元素呀，看到这里，在看看方法的返回类型，我们就能知道下面的代码的作用啦，其实就是得到相应的BeanDefinitionHolder集合，那么具体怎么得到的呢，我们需要继续往下看。</span></span><br><span class="line">	Set&lt;BeanDefinitionHolder&gt; beanDefinitions = <span class="keyword">new</span> LinkedHashSet&lt;BeanDefinitionHolder&gt;();</span><br><span class="line">	<span class="keyword">for</span> (String basePackage : basePackages) &#123;</span><br><span class="line">		Set&lt;BeanDefinition&gt; candidates = findCandidateComponents(basePackage);</span><br><span class="line">		<span class="keyword">for</span> (BeanDefinition candidate : candidates) &#123;</span><br><span class="line">			ScopeMetadata scopeMetadata = <span class="keyword">this</span>.scopeMetadataResolver.resolveScopeMetadata(candidate);</span><br><span class="line">			candidate.setScope(scopeMetadata.getScopeName());</span><br><span class="line">			String beanName = <span class="keyword">this</span>.beanNameGenerator.generateBeanName(candidate, <span class="keyword">this</span>.registry);</span><br><span class="line">			<span class="keyword">if</span> (candidate <span class="keyword">instanceof</span> AbstractBeanDefinition) &#123;</span><br><span class="line">				postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (candidate <span class="keyword">instanceof</span> AnnotatedBeanDefinition) &#123;</span><br><span class="line">				AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (checkCandidate(beanName, candidate)) &#123;</span><br><span class="line">				BeanDefinitionHolder definitionHolder = <span class="keyword">new</span> BeanDefinitionHolder(candidate, beanName);</span><br><span class="line">				definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, <span class="keyword">this</span>.registry);</span><br><span class="line">				beanDefinitions.add(definitionHolder);</span><br><span class="line">				registerBeanDefinition(definitionHolder, <span class="keyword">this</span>.registry);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> beanDefinitions;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>1.新建一个BeanDefinitionHolder集合，看到这里，在看看方法的返回类型，我们就能知道下面的代码的作用啦，其实就是得到相应的BeanDefinitionHolder集合，那么具体怎么得到的呢，我们需要继续往下看。</p>
+<p>2.调用父类ClassPathScanningCandidateComponentProvider的findCandidateComponents方法扫描包并且得到BeanDefinitionHolder集合</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Set&lt;BeanDefinition&gt; <span class="title">findCandidateComponents</span><span class="params">(String basePackage)</span> </span>&#123;</span><br><span class="line">		Set&lt;BeanDefinition&gt; candidates = <span class="keyword">new</span> LinkedHashSet&lt;BeanDefinition&gt;();</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">//base-package中的值替换为classpath*:cn/test/**/*.class  </span></span><br><span class="line"></span><br><span class="line">			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +</span><br><span class="line">					resolveBasePackage(basePackage) + <span class="string">"/"</span> + <span class="keyword">this</span>.resourcePattern;</span><br><span class="line">                     <span class="comment">//获取所有base-package下的资源  </span></span><br><span class="line"></span><br><span class="line">			Resource[] resources = <span class="keyword">this</span>.resourcePatternResolver.getResources(packageSearchPath);</span><br><span class="line">			<span class="keyword">boolean</span> traceEnabled = logger.isTraceEnabled();</span><br><span class="line">			<span class="keyword">boolean</span> debugEnabled = logger.isDebugEnabled();</span><br><span class="line">			<span class="keyword">for</span> (Resource resource : resources) &#123;</span><br><span class="line">				<span class="keyword">if</span> (traceEnabled) &#123;</span><br><span class="line">					logger.trace(<span class="string">"Scanning "</span> + resource);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">if</span> (resource.isReadable()) &#123;</span><br><span class="line">					<span class="keyword">try</span> &#123;</span><br><span class="line">						MetadataReader metadataReader = <span class="keyword">this</span>.metadataReaderFactory.getMetadataReader(resource);</span><br><span class="line">                                                                        <span class="comment">//对context:exclude-filter进行过滤  </span></span><br><span class="line"></span><br><span class="line">						<span class="keyword">if</span> (isCandidateComponent(metadataReader)) &#123;</span><br><span class="line">                                                    <span class="comment">//包装BeanDefinition  </span></span><br><span class="line"></span><br><span class="line">							ScannedGenericBeanDefinition sbd = <span class="keyword">new</span> ScannedGenericBeanDefinition(metadataReader);</span><br><span class="line">							sbd.setResource(resource);</span><br><span class="line">							sbd.setSource(resource);</span><br><span class="line"></span><br><span class="line">							<span class="keyword">if</span> (isCandidateComponent(sbd)) &#123;</span><br><span class="line">								<span class="keyword">if</span> (debugEnabled) &#123;</span><br><span class="line">									logger.debug(<span class="string">"Identified candidate component class: "</span> + resource);</span><br><span class="line">								&#125;</span><br><span class="line">								candidates.add(sbd);</span><br><span class="line">							&#125;</span><br><span class="line">							<span class="keyword">else</span> &#123;</span><br><span class="line">								<span class="keyword">if</span> (debugEnabled) &#123;</span><br><span class="line">									logger.debug(<span class="string">"Ignored because not a concrete top-level class: "</span> + resource);</span><br><span class="line">								&#125;</span><br><span class="line">							&#125;</span><br><span class="line">						&#125;</span><br><span class="line">						<span class="keyword">else</span> &#123;</span><br><span class="line">							<span class="keyword">if</span> (traceEnabled) &#123;</span><br><span class="line">								logger.trace(<span class="string">"Ignored because not matching any filter: "</span> + resource);</span><br><span class="line">							&#125;</span><br><span class="line">						&#125;</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">						<span class="keyword">throw</span> <span class="keyword">new</span> BeanDefinitionStoreException(</span><br><span class="line">								<span class="string">"Failed to read candidate component class: "</span> + resource, ex);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="keyword">if</span> (traceEnabled) &#123;</span><br><span class="line">						logger.trace(<span class="string">"Ignored because not readable: "</span> + resource);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> BeanDefinitionStoreException(<span class="string">"I/O failure during classpath scanning"</span>, ex);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> candidates;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>  (1)先根据context:component-scan 中属性的base-package=”cn.test”配置转换为classpath<em>:cn/test/**/</em>.class，并扫描对应下的class和jar文件并获取类对应的路径，返回Resources</p>
+<pre><code> (2)根据\&lt;context:exclude-filter&gt;指定的不扫描包，\&lt;context:exclude-filter&gt;指定的扫描包配置进行过滤不包含的包对应下的class和jar。
+
+（3）封装成BeanDefinition放到队列里。
+</code></pre><p>我们通过findCandidateComponents得到了BeanDefinition集合，接下来我们就需要将Bean注册到BeanFactory中了，也就是注册到Spring容器中了。</p>
+<p>3.通过registerBeanDefinition将Bean注册到BeanFactory工厂中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">registerBeanDefinition</span><span class="params">(BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)</span> </span>&#123;</span><br><span class="line">	BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">registerBeanDefinition</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">		BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)</span></span></span><br><span class="line"><span class="function">		<span class="keyword">throws</span> BeanDefinitionStoreException </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Register bean definition under primary name.</span></span><br><span class="line">	String beanName = definitionHolder.getBeanName();</span><br><span class="line">	registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Register aliases for bean name, if any.</span></span><br><span class="line">	String[] aliases = definitionHolder.getAliases();</span><br><span class="line">	<span class="keyword">if</span> (aliases != <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">for</span> (String alias : aliases) &#123;</span><br><span class="line">			registry.registerAlias(beanName, alias);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看到这里就不用再分析了吧，到了这里和之前讲解bean节点的注入初始化的步骤都是一样的了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/07/--SpringMVC配置文件的解析(二)/" data-id="cjc3psf260003vcbzd40149sm" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/01/07/SpringMVC配置文件详解(一)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">SpringMVC配置文件详解</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/07/--SpringMVC配置文件的解析(二)/">SpringMVC配置文件的解析(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/07/SpringMVC配置文件详解(一)/">SpringMVC配置文件详解</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/07/--SpringMVC配置文件解析(三)/">SpringMVC配置文件解析(三)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/06/--SpringMVC配置文件解析(四)/">SpringMVC配置文件详解（四）</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/24/--Tomcat是如何处理web.xml的（下）/">Tomcat是如何处理web.xml的（下）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
