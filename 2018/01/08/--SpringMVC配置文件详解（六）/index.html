@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>SpringMVC配置文件详解（六） | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言我们之前已经讲解过了 1&amp;lt;mvc:annotation-driven/&amp;gt; 这个标签了，但是他下面是可以有子标签的，今天我们就来讲一下他的子标签，我们在配置文件中使用了他的子标签来完成了对json数据的转化。我们先看下配置 123456789101112131415161718192021">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC配置文件详解（六）">
+<meta property="og:url" content="https://cong96.github.io/2018/01/08/--SpringMVC配置文件详解（六）/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言我们之前已经讲解过了 1&amp;lt;mvc:annotation-driven/&amp;gt; 这个标签了，但是他下面是可以有子标签的，今天我们就来讲一下他的子标签，我们在配置文件中使用了他的子标签来完成了对json数据的转化。我们先看下配置 123456789101112131415161718192021222324252627&amp;lt;mvc:annotation-driven&amp;gt;	&amp;lt;m">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-07T16:06:25.566Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringMVC配置文件详解（六）">
+<meta name="twitter:description" content="前言我们之前已经讲解过了 1&amp;lt;mvc:annotation-driven/&amp;gt; 这个标签了，但是他下面是可以有子标签的，今天我们就来讲一下他的子标签，我们在配置文件中使用了他的子标签来完成了对json数据的转化。我们先看下配置 123456789101112131415161718192021222324252627&amp;lt;mvc:annotation-driven&amp;gt;	&amp;lt;m">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post---SpringMVC配置文件详解（六）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/08/--SpringMVC配置文件详解（六）/" class="article-date">
+  <time datetime="2018-01-07T17:58:41.444Z" itemprop="datePublished">2018-01-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/SpringMVC/">SpringMVC</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      SpringMVC配置文件详解（六）
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>我们之前已经讲解过了</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mvc:annotation-driven</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这个标签了，但是他下面是可以有子标签的，今天我们就来讲一下他的子标签，我们在配置文件中使用了他的子标签来完成了对json数据的转化。我们先看下配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mvc:annotation-driven</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">mvc:message-converters</span> <span class="attr">register-defaults</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- @ResponseBody乱码问题，将StringHttpMessageConverter的默认编码设为UTF-8 --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.springframework.http.converter.StringHttpMessageConverter"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">value</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- 配置Fastjson支持 --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">bean</span></span></span><br><span class="line"><span class="tag">			<span class="attr">class</span>=<span class="string">"com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"charset"</span> <span class="attr">value</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"supportedMediaTypes"</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">list</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">value</span>&gt;</span>application/json<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">value</span>&gt;</span>text/html;charset=UTF-8<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;/<span class="name">list</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"features"</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">list</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">value</span>&gt;</span>WriteMapNullValue<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">value</span>&gt;</span>QuoteFieldNames<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">value</span>&gt;</span>WriteDateUseDateFormat<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="name">value</span>&gt;</span>WriteEnumUsingToString<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;/<span class="name">list</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">mvc:message-converters</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mvc:annotation-driven</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="解析"><a href="#解析" class="headerlink" title="\解析"></a>\解析</h3><p>我们直接看parse方法了。</p>
+<p>我们截取注册RequestMappingHandlerAdapter的部分</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> BeanDefinition <span class="title">parse</span><span class="params">(Element element, ParserContext parserContext)</span> </span>&#123;</span><br><span class="line">	ManagedList&lt;?&gt; messageConverters = getMessageConverters(element, source, parserContext);</span><br><span class="line">		ManagedList&lt;?&gt; argumentResolvers = getArgumentResolvers(element, parserContext);</span><br><span class="line">		ManagedList&lt;?&gt; returnValueHandlers = getReturnValueHandlers(element, parserContext);</span><br><span class="line">		String asyncTimeout = getAsyncTimeout(element);</span><br><span class="line">		RuntimeBeanReference asyncExecutor = getAsyncExecutor(element);</span><br><span class="line">		ManagedList&lt;?&gt; callableInterceptors = getCallableInterceptors(element, source, parserContext);</span><br><span class="line">		ManagedList&lt;?&gt; deferredResultInterceptors = getDeferredResultInterceptors(element, source, parserContext);</span><br><span class="line"></span><br><span class="line">		RootBeanDefinition handlerAdapterDef = <span class="keyword">new</span> RootBeanDefinition(RequestMappingHandlerAdapter.class);</span><br><span class="line">		handlerAdapterDef.setSource(source);</span><br><span class="line">		handlerAdapterDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);</span><br><span class="line">		handlerAdapterDef.getPropertyValues().add(<span class="string">"contentNegotiationManager"</span>, contentNegotiationManager);</span><br><span class="line">		handlerAdapterDef.getPropertyValues().add(<span class="string">"webBindingInitializer"</span>, bindingDef);</span><br><span class="line">		handlerAdapterDef.getPropertyValues().add(<span class="string">"messageConverters"</span>, messageConverters);</span><br><span class="line">		addResponseBodyAdvice(handlerAdapterDef);</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>其中getMessageConverters(element, source, parserContext);就是得到我们配置的messageConverters，然后使用    handlerAdapterDef.getPropertyValues().add(“messageConverters”, messageConverters);注入到messageConverters属性中。</p>
+<p><strong>getMessageConverters</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> ManagedList&lt;?&gt; getMessageConverters(Element element, Object source, ParserContext parserContext) &#123;</span><br><span class="line">		Element convertersElement = DomUtils.getChildElementByTagName(element, <span class="string">"message-converters"</span>);</span><br><span class="line">		ManagedList&lt;? <span class="keyword">super</span> Object&gt; messageConverters = <span class="keyword">new</span> ManagedList&lt;Object&gt;();</span><br><span class="line">		<span class="keyword">if</span> (convertersElement != <span class="keyword">null</span>) &#123;</span><br><span class="line">			messageConverters.setSource(source);</span><br><span class="line">			<span class="keyword">for</span> (Element beanElement : DomUtils.getChildElementsByTagName(convertersElement, <span class="string">"bean"</span>, <span class="string">"ref"</span>)) &#123;</span><br><span class="line">				Object object = parserContext.getDelegate().parsePropertySubElement(beanElement, <span class="keyword">null</span>);</span><br><span class="line">				messageConverters.add(object);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (convertersElement == <span class="keyword">null</span> || Boolean.valueOf(convertersElement.getAttribute(<span class="string">"register-defaults"</span>))) &#123;</span><br><span class="line">			messageConverters.setSource(source);</span><br><span class="line">			messageConverters.add(createConverterDefinition(ByteArrayHttpMessageConverter.class, source));</span><br><span class="line"></span><br><span class="line">			RootBeanDefinition stringConverterDef = createConverterDefinition(StringHttpMessageConverter.class, source);</span><br><span class="line">			stringConverterDef.getPropertyValues().add(<span class="string">"writeAcceptCharset"</span>, <span class="keyword">false</span>);</span><br><span class="line">			messageConverters.add(stringConverterDef);</span><br><span class="line"></span><br><span class="line">			messageConverters.add(createConverterDefinition(ResourceHttpMessageConverter.class, source));</span><br><span class="line">			messageConverters.add(createConverterDefinition(SourceHttpMessageConverter.class, source));</span><br><span class="line">			messageConverters.add(createConverterDefinition(AllEncompassingFormHttpMessageConverter.class, source));</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (romePresent) &#123;</span><br><span class="line">				messageConverters.add(createConverterDefinition(AtomFeedHttpMessageConverter.class, source));</span><br><span class="line">				messageConverters.add(createConverterDefinition(RssChannelHttpMessageConverter.class, source));</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (jackson2XmlPresent) &#123;</span><br><span class="line">				RootBeanDefinition jacksonConverterDef = createConverterDefinition(MappingJackson2XmlHttpMessageConverter.class, source);</span><br><span class="line">				GenericBeanDefinition jacksonFactoryDef = createObjectMapperFactoryDefinition(source);</span><br><span class="line">				jacksonFactoryDef.getPropertyValues().add(<span class="string">"createXmlMapper"</span>, <span class="keyword">true</span>);</span><br><span class="line">				jacksonConverterDef.getConstructorArgumentValues().addIndexedArgumentValue(<span class="number">0</span>, jacksonFactoryDef);</span><br><span class="line">				messageConverters.add(jacksonConverterDef);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span> (jaxb2Present) &#123;</span><br><span class="line">				messageConverters.add(createConverterDefinition(Jaxb2RootElementHttpMessageConverter.class, source));</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (jackson2Present) &#123;</span><br><span class="line">				RootBeanDefinition jacksonConverterDef = createConverterDefinition(MappingJackson2HttpMessageConverter.class, source);</span><br><span class="line">				GenericBeanDefinition jacksonFactoryDef = createObjectMapperFactoryDefinition(source);</span><br><span class="line">				jacksonConverterDef.getConstructorArgumentValues().addIndexedArgumentValue(<span class="number">0</span>, jacksonFactoryDef);</span><br><span class="line">				messageConverters.add(jacksonConverterDef);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span> (gsonPresent) &#123;</span><br><span class="line">				messageConverters.add(createConverterDefinition(GsonHttpMessageConverter.class, source));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> messageConverters;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>1,查看配置文件中是否有\标签，如果有，将其下的bean注入到messageConverters中。</p>
+<p>2.如果没有，就使用默认的注册策略。如果有，且标签里的register-defaults属性为true，那么也要在用户自己实现的messageConverters中添加默认策略。</p>
+<p>默认策略注册了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ByteArrayHttpMessageConverter</span><br><span class="line">StringHttpMessageConverter</span><br><span class="line">ResourceHttpMessageConverter</span><br><span class="line">SourceHttpMessageConverter</span><br><span class="line">AllEncompassingFormHttpMessageConverter</span><br><span class="line">AtomFeedHttpMessageConverter</span><br><span class="line">RssChannelHttpMessageConverter</span><br></pre></td></tr></table></figure>
+<p>以及当程序中引入了某些包后自动会注册相应xml，json类型数据的MessageConverter。</p>
+<p>举个例子，当添加了Gson包这个处理json数据的包之后，就会默认的添加GsonHttpMessageConverter。相应代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (gsonPresent) &#123;</span><br><span class="line">				messageConverters.add(createConverterDefinition(GsonHttpMessageConverter.class, source));</span><br><span class="line">			&#125;</span><br></pre></td></tr></table></figure>
+<p>所以这也也是为什么当添加了jackson包或者Gson包，我们的SpringMVC可以自动的处理json格式数据，而为什么我们添加fastjson这个处理json数据的包就不行呢，就必须自己注册，因为默认策略里没有他的一席之地。</p>
+<p>\允许了用户实现自己的MessageConverter注入到messageConverters中，扩展了SpringMVC的作用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/08/--SpringMVC配置文件详解（六）/" data-id="cjc5323qf00017cbzjjedcmuw" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/08/--SpringMVC请求处理之对方法参数的处理/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          SpringMVC请求处理之对方法参数的处理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/07/--SpringMVC配置文件解析（五）/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">SpringMVC配置文件解析（五）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/08/--SpringMVC请求处理之对方法参数的处理/">SpringMVC请求处理之对方法参数的处理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/08/--SpringMVC配置文件详解（六）/">SpringMVC配置文件详解（六）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/07/--SpringMVC配置文件解析（五）/">SpringMVC配置文件解析（五）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/07/--SpringMVC配置文件的解析(二)/">SpringMVC配置文件的解析(二)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/07/SpringMVC配置文件详解(一)/">SpringMVC配置文件详解</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
