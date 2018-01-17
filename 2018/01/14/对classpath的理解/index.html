@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>对classpath的理解 | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言最近在看一个项目，看到他在web.xml配置文件中使用了classpath*:后跟配置文件通配符。 而我一般都是用的classpath:,这时候突然想起我之前有特意查阅过两种方式的区别，不过很遗憾的是我已经忘了，所以这次打算记录下来，就算以后再忘了也后及时查阅。 ResourceLoader我们废话不多说，直接看s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对classpath的理解">
+<meta property="og:url" content="https://cong96.github.io/2018/01/14/对classpath的理解/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言最近在看一个项目，看到他在web.xml配置文件中使用了classpath*:后跟配置文件通配符。 而我一般都是用的classpath:,这时候突然想起我之前有特意查阅过两种方式的区别，不过很遗憾的是我已经忘了，所以这次打算记录下来，就算以后再忘了也后及时查阅。 ResourceLoader我们废话不多说，直接看spring对这两种方式修饰配置文件位置的方法是如何加载相应配置文件。 回到Ab">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-14T13:49:37.048Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对classpath的理解">
+<meta name="twitter:description" content="前言最近在看一个项目，看到他在web.xml配置文件中使用了classpath*:后跟配置文件通配符。 而我一般都是用的classpath:,这时候突然想起我之前有特意查阅过两种方式的区别，不过很遗憾的是我已经忘了，所以这次打算记录下来，就算以后再忘了也后及时查阅。 ResourceLoader我们废话不多说，直接看spring对这两种方式修饰配置文件位置的方法是如何加载相应配置文件。 回到Ab">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-对classpath的理解" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/14/对classpath的理解/" class="article-date">
+  <time datetime="2018-01-14T13:50:41.923Z" itemprop="datePublished">2018-01-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JavaWEB/">JavaWEB</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      对classpath的理解
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近在看一个项目，看到他在web.xml配置文件中使用了classpath*:后跟配置文件通配符。</p>
+<p>而我一般都是用的classpath:,这时候突然想起我之前有特意查阅过两种方式的区别，不过很遗憾的是我已经忘了，所以这次打算记录下来，就算以后再忘了也后及时查阅。</p>
+<h3 id="ResourceLoader"><a href="#ResourceLoader" class="headerlink" title="ResourceLoader"></a>ResourceLoader</h3><p>我们废话不多说，直接看spring对这两种方式修饰配置文件位置的方法是如何加载相应配置文件。</p>
+<p>回到AbstractApplicationContext的refresh方法，我们看获取Beanfactory的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">		ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> ConfigurableListableBeanFactory <span class="title">obtainFreshBeanFactory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	refreshBeanFactory();</span><br><span class="line">	ConfigurableListableBeanFactory beanFactory = getBeanFactory();</span><br><span class="line">	<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">		logger.debug(<span class="string">"Bean factory for "</span> + getDisplayName() + <span class="string">": "</span> + beanFactory);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> beanFactory;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>进入AbstractRefreshableApplicationContext的refreshBeanFactory</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">refreshBeanFactory</span><span class="params">()</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (hasBeanFactory()) &#123;</span><br><span class="line">			destroyBeans();</span><br><span class="line">			closeBeanFactory();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			DefaultListableBeanFactory beanFactory = createBeanFactory();</span><br><span class="line">			beanFactory.setSerializationId(getId());</span><br><span class="line">			customizeBeanFactory(beanFactory);</span><br><span class="line">			loadBeanDefinitions(beanFactory);</span><br><span class="line">			<span class="keyword">synchronized</span> (<span class="keyword">this</span>.beanFactoryMonitor) &#123;</span><br><span class="line">				<span class="keyword">this</span>.beanFactory = beanFactory;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> ApplicationContextException(<span class="string">"I/O error parsing bean definition source for "</span> + getDisplayName(), ex);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>其中有一个loadBeanDefinitions(beanFactory);就是在这个方法里，我们<strong>读取配置文件并注册Bean</strong></p>
+<p>XmlWebApplicationContext(默认是该实例)的loadBeanDefinitions</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">loadBeanDefinitions</span><span class="params">(DefaultListableBeanFactory beanFactory)</span> <span class="keyword">throws</span> BeansException, IOException </span>&#123;</span><br><span class="line">		<span class="comment">// Create a new XmlBeanDefinitionReader for the given BeanFactory.</span></span><br><span class="line">		XmlBeanDefinitionReader beanDefinitionReader = <span class="keyword">new</span> XmlBeanDefinitionReader(beanFactory);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Configure the bean definition reader with this context's</span></span><br><span class="line">		<span class="comment">// resource loading environment.</span></span><br><span class="line">		beanDefinitionReader.setEnvironment(getEnvironment());</span><br><span class="line">		beanDefinitionReader.setResourceLoader(<span class="keyword">this</span>);</span><br><span class="line">		beanDefinitionReader.setEntityResolver(<span class="keyword">new</span> ResourceEntityResolver(<span class="keyword">this</span>));</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Allow a subclass to provide custom initialization of the reader,</span></span><br><span class="line">		<span class="comment">// then proceed with actually loading the bean definitions.</span></span><br><span class="line">		initBeanDefinitionReader(beanDefinitionReader);</span><br><span class="line">		loadBeanDefinitions(beanDefinitionReader);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>我们看到有为beanDefinitionReader设置ResourceLoader</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beanDefinitionReader.setResourceLoader(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+<p>这里我们将XmlWebApplicationContext实例设置为了ResourceLoader，因为XmlWebApplicationContext也是一个实现了ResourceLoader的类的子类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">XmlWebApplicationContext</span> <span class="keyword">extends</span> <span class="title">AbstractRefreshableWebApplicationContext</span> </span>&#123;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractRefreshableWebApplicationContext</span> <span class="keyword">extends</span> <span class="title">AbstractRefreshableConfigApplicationContext</span></span></span><br><span class="line"><span class="class">		<span class="keyword">implements</span> <span class="title">ConfigurableWebApplicationContext</span>, <span class="title">ThemeSource</span> </span>&#123;</span><br><span class="line">		<span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractRefreshableConfigApplicationContext</span> <span class="keyword">extends</span> <span class="title">AbstractRefreshableApplicationContext</span></span></span><br><span class="line"><span class="class">		<span class="keyword">implements</span> <span class="title">BeanNameAware</span>, <span class="title">InitializingBean</span> </span>&#123;</span><br><span class="line">		<span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractRefreshableApplicationContext</span> <span class="keyword">extends</span> <span class="title">AbstractApplicationContext</span> </span>&#123;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractApplicationContext</span> <span class="keyword">extends</span> <span class="title">DefaultResourceLoader</span></span></span><br><span class="line"><span class="class">		<span class="keyword">implements</span> <span class="title">ConfigurableApplicationContext</span>, <span class="title">DisposableBean</span> </span>&#123;</span><br><span class="line">		<span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultResourceLoader</span> <span class="keyword">implements</span> <span class="title">ResourceLoader</span> </span>&#123;</span><br></pre></td></tr></table></figure>
+<p>接着看        loadBeanDefinitions(beanDefinitionReader);</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">loadBeanDefinitions</span><span class="params">(XmlBeanDefinitionReader reader)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">	String[] configLocations = getConfigLocations();</span><br><span class="line">	<span class="keyword">if</span> (configLocations != <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">for</span> (String configLocation : configLocations) &#123;</span><br><span class="line">			reader.loadBeanDefinitions(configLocation);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>org.springframework.beans.factory.xml.XmlBeanDefinitionReader父类AbstractBeanDefinitionReader</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">loadBeanDefinitions</span><span class="params">(String location)</span> <span class="keyword">throws</span> BeanDefinitionStoreException </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> loadBeanDefinitions(location, <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">loadBeanDefinitions</span><span class="params">(String location, Set&lt;Resource&gt; actualResources)</span> <span class="keyword">throws</span> BeanDefinitionStoreException </span>&#123;</span><br><span class="line">	ResourceLoader resourceLoader = getResourceLoader();</span><br><span class="line">	<span class="keyword">if</span> (resourceLoader == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> BeanDefinitionStoreException(</span><br><span class="line">				<span class="string">"Cannot import bean definitions from location ["</span> + location + <span class="string">"]: no ResourceLoader available"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (resourceLoader <span class="keyword">instanceof</span> ResourcePatternResolver) &#123;</span><br><span class="line">		<span class="comment">// Resource pattern matching available.</span></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);</span><br><span class="line">			<span class="keyword">int</span> loadCount = loadBeanDefinitions(resources);</span><br><span class="line">			<span class="keyword">if</span> (actualResources != <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">for</span> (Resource resource : resources) &#123;</span><br><span class="line">					actualResources.add(resource);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">				logger.debug(<span class="string">"Loaded "</span> + loadCount + <span class="string">" bean definitions from location pattern ["</span> + location + <span class="string">"]"</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> loadCount;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> BeanDefinitionStoreException(</span><br><span class="line">					<span class="string">"Could not resolve bean definition resource pattern ["</span> + location + <span class="string">"]"</span>, ex);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// Can only load single resources by absolute URL.</span></span><br><span class="line">		Resource resource = resourceLoader.getResource(location);</span><br><span class="line">		<span class="keyword">int</span> loadCount = loadBeanDefinitions(resource);</span><br><span class="line">		<span class="keyword">if</span> (actualResources != <span class="keyword">null</span>) &#123;</span><br><span class="line">			actualResources.add(resource);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">			logger.debug(<span class="string">"Loaded "</span> + loadCount + <span class="string">" bean definitions from location ["</span> + location + <span class="string">"]"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> loadCount;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​        ResourceLoader resourceLoader = getResourceLoader();</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">	public ResourceLoader getResourceLoader() &#123;</span><br><span class="line">		return this.resourceLoader;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>resourceLoader就是XmlWebApplicationContext实例</p>
+<p>主要关注    Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);</p>
+<p>XmlWebApplicationContext没有直接实现这个方法，在祖先类AbstractApplicationContext中实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> Resource[] getResources(String locationPattern) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">this</span>.resourcePatternResolver.getResources(locationPattern);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们真正调用的是resourcePatternResolver的getResources方法，那他到底是哪个实例呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">AbstractApplicationContext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.resourcePatternResolver = getResourcePatternResolver();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> ResourcePatternResolver <span class="title">getResourcePatternResolver</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> PathMatchingResourcePatternResolver(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>org.springframework.core.io.support.PathMatchingResourcePatternResolver的getResources</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> Resource[] getResources(String locationPattern) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">	Assert.notNull(locationPattern, <span class="string">"Location pattern must not be null"</span>);</span><br><span class="line">	<span class="keyword">if</span> (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) &#123;</span><br><span class="line">		<span class="comment">// a class path resource (multiple resources for same name possible)</span></span><br><span class="line">		<span class="keyword">if</span> (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) &#123;</span><br><span class="line">			<span class="comment">// a class path resource pattern</span></span><br><span class="line">			<span class="keyword">return</span> findPathMatchingResources(locationPattern);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// all class path resources with the given name</span></span><br><span class="line">			<span class="keyword">return</span> findAllClassPathResources(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// Only look for a pattern after a prefix here</span></span><br><span class="line">		<span class="comment">// (to not get fooled by a pattern symbol in a strange prefix).</span></span><br><span class="line">		<span class="keyword">int</span> prefixEnd = locationPattern.indexOf(<span class="string">":"</span>) + <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">if</span> (getPathMatcher().isPattern(locationPattern.substring(prefixEnd))) &#123;</span><br><span class="line">			<span class="comment">// a file pattern</span></span><br><span class="line">			<span class="keyword">return</span> findPathMatchingResources(locationPattern);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// a single resource with the given name</span></span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> Resource[] &#123;getResourceLoader().getResource(locationPattern)&#125;;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>终于来到我们要分析的方法了</strong></p>
+<p>再说一下，这个方法是位于org.springframework.core.io.support.PathMatchingResourcePatternResolver的getResources。</p>
+<p>我们初看一下这个方法，可以看到大概分三个分支来处理资源的加载。</p>
+<p>而如果按照classpath和classpath*来区分的话，很显然就是两种。</p>
+<p>当这种两种方式的配置文件路径都是统配符的时候调用的是同一个方法，当然具体方法里的流程还是不一样的，当是指定路径的时候都有各自的处理方法，我们先就从无通配符先来分析吧。</p>
+<ul>
+<li><p><strong>classpath*</strong></p>
+<p>findAllClassPathResources</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Resource[] findAllClassPathResources(String location) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">	String path = location;</span><br><span class="line">	<span class="keyword">if</span> (path.startsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">		path = path.substring(<span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	Set&lt;Resource&gt; result = doFindAllClassPathResources(path);</span><br><span class="line">	<span class="keyword">return</span> result.toArray(<span class="keyword">new</span> Resource[result.size()]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果location以/打头，把/去掉，然后调用</p>
+<p>doFindAllClassPathResources得到我们想要的资源</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Set&lt;Resource&gt; <span class="title">doFindAllClassPathResources</span><span class="params">(String path)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		Set&lt;Resource&gt; result = <span class="keyword">new</span> LinkedHashSet&lt;Resource&gt;(<span class="number">16</span>);</span><br><span class="line">		ClassLoader cl = getClassLoader();</span><br><span class="line">		Enumeration&lt;URL&gt; resourceUrls = (cl != <span class="keyword">null</span> ? cl.getResources(path) : ClassLoader.getSystemResources(path));</span><br><span class="line">		<span class="keyword">while</span> (resourceUrls.hasMoreElements()) &#123;</span><br><span class="line">			URL url = resourceUrls.nextElement();</span><br><span class="line">			result.add(convertClassLoaderURL(url));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (<span class="string">""</span>.equals(path)) &#123;</span><br><span class="line">			<span class="comment">// The above result is likely to be incomplete, i.e. only containing file system references.</span></span><br><span class="line">			<span class="comment">// We need to have pointers to each of the jar files on the classpath as well...</span></span><br><span class="line">			addAllClassLoaderJarRoots(cl, result);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> result;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>1.先定义一个size为16的LinkedHashSet集合，命名为result。</p>
+<p>2、然后通过getClassLoader();方法得到一个ClassLaoder对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ClassLoader <span class="title">getClassLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> getResourceLoader().getClassLoader();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResourceLoader <span class="title">getResourceLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">this</span>.resourceLoader;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>很明显是调用了resourceLoader属性的getClassLoader();方法，那么这个对象是什么呢，又是什么时候注入的呢，其实上面已经给出答案了。这个对象是一个XmlWebApplicationContext实例。最后你会发现调用的祖先类DefaultResourceLoader的getClassLoader方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ClassLoader <span class="title">getClassLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> (<span class="keyword">this</span>.classLoader != <span class="keyword">null</span> ? <span class="keyword">this</span>.classLoader : ClassUtils.getDefaultClassLoader());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后你会发现ClassLoader对象是由ClassUtils.getDefaultClassLoader()得到的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ClassLoader <span class="title">getDefaultClassLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	ClassLoader cl = <span class="keyword">null</span>;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		cl = Thread.currentThread().getContextClassLoader();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">		<span class="comment">// Cannot access thread context ClassLoader - falling back...</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (cl == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="comment">// No thread context class loader -&gt; use class loader of this class.</span></span><br><span class="line">		cl = ClassUtils.class.getClassLoader();</span><br><span class="line">		<span class="keyword">if</span> (cl == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="comment">// getClassLoader() returning null indicates the bootstrap ClassLoader</span></span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				cl = ClassLoader.getSystemClassLoader();</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">				<span class="comment">// Cannot access system ClassLoader - oh well, maybe the caller can live with null...</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> cl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先取当前线程的ClassLoader实例，如果取不到，那就调用ClassUtils类的classLoader实例，如果还是没有，就调用ClassLoader.getSystemClassLoader();返回委托的系统类加载器。该加载器是新的 ClassLoader 实例的默认委托父类加载器，通常是用来启动应用程序的类加载器。 </p>
+<p>在运行时启动序列的早期首先调用此方法，这时会创建系统类加载器并将其设置为调用 Thread 的上下文类加载器。<br>默认的系统类加载器是此类的一个与实现有关的实例。 </p>
+<p>3.由上面得到的类加载器实例调用 cl.getResources(path)来ClassLoader (Java Platform SE 6)</p>
+<p>查找所有给定名称的资源。资源是可以通过类代码以与代码基无关的方式访问的某些数据（图像、声音、文本等）。 </p>
+<p>4.将得到的资源的URL封装成UrlResource放入到rusult集合中。</p>
+<p>5.如果路径不为“”的话，此时就可以返回result了，但是如果一旦为“”的时候，那就需要调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addAllClassLoaderJarRoots(cl, result);</span><br></pre></td></tr></table></figure>
+<p>对类路径中的每个jar文件加载。</p>
+<p>​</p>
+<p>​</p>
+</li>
+<li><p><strong>classpath</strong></p>
+<p>其实更准确的说是非classpath*</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Resource <span class="title">getResource</span><span class="params">(String location)</span> </span>&#123;</span><br><span class="line">	Assert.notNull(location, <span class="string">"Location must not be null"</span>);</span><br><span class="line">	<span class="keyword">if</span> (location.startsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">		<span class="keyword">return</span> getResourceByPath(location);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (location.startsWith(CLASSPATH_URL_PREFIX)) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="comment">// Try to parse the location as a URL...</span></span><br><span class="line">			URL url = <span class="keyword">new</span> URL(location);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> UrlResource(url);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (MalformedURLException ex) &#123;</span><br><span class="line">			<span class="comment">// No URL -&gt; resolve as resource path.</span></span><br><span class="line">			<span class="keyword">return</span> getResourceByPath(location);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>1.如果是以/打头的生成一个ClassPathContextResource类型对象，这个类是DefaultResourceLoader的内部类，继承了ClassPathResource类，实际上还是调用的是后者的方法，在构造方法中会去掉/。</p>
+<p>2.如果是以classpath:打头的，生成一个ClassPathResource对象。</p>
+<p>3,否则就尝试创建一个UrlResource对象，如果创建失败，生成一个ClassPathContextResource对象返回。</p>
+</li>
+<li><p>通配符findPathMatchingResources</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Resource <span class="title">getResource</span><span class="params">(String location)</span> </span>&#123;  </span><br><span class="line">    Assert.notNull(location, <span class="string">"Location must not be null"</span>);  </span><br><span class="line">    <span class="keyword">if</span> (location.startsWith(CLASSPATH_URL_PREFIX)) &#123;  </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">else</span> &#123;  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            <span class="comment">// Try to parse the location as a URL...  </span></span><br><span class="line">            URL url = <span class="keyword">new</span> URL(location);  </span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> UrlResource(url);  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">catch</span> (MalformedURLException ex) &#123;  </span><br><span class="line">            <span class="comment">// No URL -&gt; resolve as resource path.  </span></span><br><span class="line">            <span class="keyword">return</span> getResourceByPath(location);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line">其实很简单，如果以classpath开头，则创建为一个ClassPathResource，否则则试图以URL的方式加载资源，创建一个UrlResource.</span><br><span class="line">路径包含通配符的</span><br><span class="line">             这种情况是最复杂的，涉及到层层递归，那我把加了注释的代码发出来大家看一下，其实主要的思想就是</span><br><span class="line"><span class="number">1</span>.先获取目录，加载目录里面的所有资源</span><br><span class="line"><span class="number">2</span>.在所有资源里面进行查找匹配，找出我们需要的资源</span><br><span class="line">[java] view plain copy</span><br><span class="line"><span class="keyword">protected</span> Resource[] findPathMatchingResources(String locationPattern) <span class="keyword">throws</span> IOException &#123;  </span><br><span class="line">        <span class="comment">//拿到能确定的目录，即拿到不包括通配符的能确定的路径  比如classpath*:/aaa/bbb/spring-*.xml 则返回classpath*:/aaa/bbb/                                     //如果是classpath*:/aaa/*/spring-*.xml，则返回 classpath*:/aaa/  </span></span><br><span class="line">        String rootDirPath = determineRootDir(locationPattern);  </span><br><span class="line">        <span class="comment">//得到spring-*.xml  </span></span><br><span class="line">        String subPattern = locationPattern.substring(rootDirPath.length());  </span><br><span class="line">        <span class="comment">//递归加载所有的根目录资源，要注意的是递归的时候又得考虑classpath,与classpath*的情况，而且还得考虑根路径中是否又包含通配符，参考上面那张流程图  </span></span><br><span class="line">        Resource[] rootDirResources = getResources(rootDirPath);  </span><br><span class="line">        Set&lt;Resource&gt; result = <span class="keyword">new</span> LinkedHashSet&lt;Resource&gt;(<span class="number">16</span>);  </span><br><span class="line">        <span class="comment">//将根目录所有资源中所有匹配我们需要的资源(如spring-*)加载result中  </span></span><br><span class="line">        <span class="keyword">for</span> (Resource rootDirResource : rootDirResources) &#123;  </span><br><span class="line">            rootDirResource = resolveRootDirResource(rootDirResource);  </span><br><span class="line">            <span class="keyword">if</span> (isJarResource(rootDirResource)) &#123;  </span><br><span class="line">                result.addAll(doFindPathMatchingJarResources(rootDirResource, subPattern));  </span><br><span class="line">            &#125;  </span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (rootDirResource.getURL().getProtocol().startsWith(ResourceUtils.URL_PROTOCOL_VFS)) &#123;  </span><br><span class="line">                result.addAll(VfsResourceMatchingDelegate.findMatchingResources(rootDirResource, subPattern, getPathMatcher()));  </span><br><span class="line">            &#125;  </span><br><span class="line">            <span class="keyword">else</span> &#123;  </span><br><span class="line">                result.addAll(doFindPathMatchingFileResources(rootDirResource, subPattern));  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;  </span><br><span class="line">            logger.debug(<span class="string">"Resolved location pattern ["</span> + locationPattern + <span class="string">"] to resources "</span> + result);  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> result.toArray(<span class="keyword">new</span> Resource[result.size()]);  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>1.先获取目录，加载目录里面的所有资源</p>
+<p>2.在所有资源里面进行查找匹配，找出我们需要的资源</p>
+<p><strong>一定要注意determineRootDir得到的是完全确定的目录，也就是说这个目录结构中是不能包含通配符的</strong>.</p>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>1.无论是classpath还是classpath*都可以加载整个classpath下（包括jar包里面）的资源文件。</p>
+<p>2.classpath只会返回第一个匹配的资源，查找路径是优先在项目中存在资源文件，再查找jar包。classpath*:会找到所有的。</p>
+<p>3.其实两者的区别实际上就是ClassLoader的getResoure和getResources的区别。</p>
+<p>classpath*:调用的是getResources,这个已经很明显了，而你如果去观看classpath对应的Resource封装类，你会发现getUrl方法内部都是调用的getResource方法。</p>
+<p>4.当出现classpath:spring*/spring-*.xml和classpath<em>\</em>:spring<em>/spring-\</em>.xml时，前者找不到资源后者可以找到。（当然前提是相应位置有），这个到底是否是正确的，还需要明天去公司验证。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/14/对classpath的理解/" data-id="cjcj5a2ji0001lobz904zktw2" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/17/session/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Cookie和Session
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/11/Spring配置文件解析(一)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring之BeanFactoryPostProcessor</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/17/session/">Cookie和Session</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/14/对classpath的理解/">对classpath的理解</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/11/Spring配置文件解析(一)/">Spring之BeanFactoryPostProcessor</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/08/--SpringMVC请求处理之对方法参数的处理/">SpringMVC请求处理之对方法参数的处理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/08/--SpringMVC配置文件详解（六）/">SpringMVC配置文件详解（六）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

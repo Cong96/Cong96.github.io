@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Cookie和Session | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="###前言 最近在看Tomcat的源码，然后想着就把Servlet的相关知识都复习一下吧。自然就需要关注Cookie和Session了。 ###Cookie Response 操作Cookie的方法就一个 addCookie()通常我们添加Cookie的操作如下12Cookie cookie=new Cookie(&q">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cookie和Session">
+<meta property="og:url" content="https://cong96.github.io/2018/01/17/session/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="###前言 最近在看Tomcat的源码，然后想着就把Servlet的相关知识都复习一下吧。自然就需要关注Cookie和Session了。 ###Cookie Response 操作Cookie的方法就一个 addCookie()通常我们添加Cookie的操作如下12Cookie cookie=new Cookie(&quot;name&quot;,&quot;kobe&quot;);response.addCookie(cookie);">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-17T14:08:42.750Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Cookie和Session">
+<meta name="twitter:description" content="###前言 最近在看Tomcat的源码，然后想着就把Servlet的相关知识都复习一下吧。自然就需要关注Cookie和Session了。 ###Cookie Response 操作Cookie的方法就一个 addCookie()通常我们添加Cookie的操作如下12Cookie cookie=new Cookie(&quot;name&quot;,&quot;kobe&quot;);response.addCookie(cookie);">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-session" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/17/session/" class="article-date">
+  <time datetime="2018-01-17T14:07:23.732Z" itemprop="datePublished">2018-01-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java-WEB/">Java WEB</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Cookie和Session
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>###前言</p>
+<p>最近在看Tomcat的源码，然后想着就把Servlet的相关知识都复习一下吧。自然就需要关注Cookie和Session了。</p>
+<p>###Cookie</p>
+<p>Response 操作Cookie的方法就一个 addCookie()<br>通常我们添加Cookie的操作如下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cookie cookie=<span class="keyword">new</span> Cookie(<span class="string">"name"</span>,<span class="string">"kobe"</span>);</span><br><span class="line">response.addCookie(cookie);</span><br></pre></td></tr></table></figure></p>
+<p>通常我们这样操作只设置了Cookie的name value<br>但是Cookie还是有很多其他的属性的。<br>name  String   该Cookie的名称。Cookie一旦创建，名称便不可更改<br>value Object   该Cookie的值。如果值为Unicode字符，需要为字符编码。如果值为二进制数据，则需要使用BASE64编码<br>maxAge int     该Cookie失效的时间，单位秒。如果为正数，则该Cookie在maxAge秒之后失效。如果为负数，该Cookie为临时Cookie，关闭浏览器即失效，浏览器也不会以任何形式保存该Cookie。如果为0，表示删除该Cookie。默认为–1<br>secure boolean 该Cookie是否仅被使用安全协议传输。安全协议。安全协议有HTTPS，SSL等，在网络上传输数据之前先将数据加密。默认为false<br><strong>path</strong>  String 该Cookie的使用路径。如果设置为“/sessionWeb/”，则只有contextPath为“/sessionWeb”的程序可以访问该Cookie。如果设置为“/”，则本域名下contextPath都可以访问该Cookie。注意最后一个字符必须为“/”<br>那我们默认没有显式指定的时候是什么呢？<br>这个就跟我们在哪里添加Cookie有关。<br>localhost:8080/mywebapp/testcookie/test1.jsp<br>比如我在/mywebapp/testcookie/test1.jsp中添加的Cookie，没有显示指定path<br>那么这里的path默认就是/mywebapp/testcookie/<br>即默认情况下，只有与创建 cookie 的页面在同一个目录或子目录下的网页才可以访问，这个是因为安全方面的考虑，造成不是所有页面都可以随意访问其他页面创建的 cookie。<br><strong>domain</strong> String<br>可以访问该Cookie的域名。如果设置为“.google.com”，则所有以“google.com”结尾的域名都可以访问该Cookie。注意第一个字符必须为“.”<br>那么如果没有显示的设置呢？<br>如网址为www.jb51.net/test/test.aspx，那么domain默认为www.jb51.net。<br>而跨域访问，如域A为t1.test.com，域B为t2.test.com，那么在域A生产一个令域A和域B都能访问的cookie就要将该cookie的domain设置为.test.com；如果要在域A生产一个令域A不能访问而域B能访问的cookie就要将该cookie的domain设置为t2.test.com。</p>
+<p>comment  String<br>该Cookie的用处说明。浏览器显示Cookie信息的时候显示该说明<br>version int 该Cookie使用的版本号。0表示遵循Netscape的Cookie规范，1表示遵循W3C的RFC<br>2109规范</p>
+<p>cookie有大小限制 4kb<br>同个网站可以创建多个 cookie ，而多个 cookie 可以存放在同一个cookie 文件中。</p>
+<p>介绍了这么多关于Cookie的知识，但是还没有介绍Cookie的应用，我们需要很好的掌握基础知识，但是同样的，我们更需要知道怎样去应用这些知识，学以致用才是我们追求的。</p>
+<p>很明显，当没有Cookie的时候，如果我们登陆一个网站，而网站的每一个页面都需要用户名密码验证的时候，我们需要在每次提交访问页面的请求的时候都需要<strong>显式的带上用户名和密码等消息</strong>。（也就是说用户名和密码必须是请求参数），这显然是很糟糕的体验，所以Cookie就出现了，他解决了这一问题。<br>有了Cookie之后可以这么做呢，第一次登陆页面的请求过来，请求参数里面必然是有用户名和密码的。那么我们在服务器端(以Java语言 web容器:Tomcat 为例),将用户名和密码的信息添加到Cookie当中，使用response.addCookie添加。然后将信息存入数据库中。<br>你观看Tomcat的源码：org.apache.catalina.connector.Response就可以看到最后Cookie的信息会存到Set-Cookie这个响应头字段中。<br>然后Cookie信息就会到浏览器中了，这个时候浏览器会根据maxAge即Cookie的有效时间来判断是否需要存放在本地磁盘中，如果maxAge没有在服务器端进行显示的设置，即默认的设置为-1,那么这个Cookie就会随着浏览器窗口的关闭而失效。而如果是一个d大于0的maxAge，就会将其存放到本地磁盘中。（不同的浏览器的存放位置不同），而不同domain或者path的Cookie都会存放在不同的Cookie文件中，而两者都相同的Cookie会存在同一文件中。<br>那么这里很明显我们需要设置一个显式的maxAge，单位为秒，如果希望密码保存一星期则<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cookie.setMaxAge(<span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">7</span>);</span><br></pre></td></tr></table></figure></p>
+<p>这时，当我们第二次访问该网站的页面的时候，在我们的请求头里就会出现Cookie的相关信息。<br>会在请求头的Cookie字段中。（因为domain和path都符合，所以我们存在本地磁盘的用户名和密码cookie会出现在请求头中），这时候我们在服务器端再需要验证登录是否合法的时候，就不需要把用户名和密码显示的拿过来了，因为已经在Cookie中带过来了，那么我们就可以在服务器端中找到相应的Cookie信息，然后再去与数据库中的信息比较，看是否有效。这样就避免了每次都要输入用户名和密码。</p>
+<p>但是很明显，如果你不是一个开发小白，你就知道上述的设计存在很多问题。<br>1.直接把密码放入到Cookie中也太不严谨了把，cookie信息可是可以直接用js获取的，是没有任何安全保障的。<br>2.是否真的需要每次去把cookie中的信息放到数据库（特指传统的关系型数据库）中去比较。</p>
+<p>对于第一点，也就是安全性，相对于第二点的性能，这是我们急需用解决的。<br>解决方法：可能你一开始就会想到，之前不是说了cookie有一个属性叫做secure，你在设置cookie的时候把他设置成true不就好了么，这样他就只能在HTTPS,SSL等安全协议下传输了。但是他也只能保证 cookie 与服务器之间的数据传输过程加密，而保存在本地的 cookie文件并不加密。所以如果想让本地cookie也加密，就得自己加密数据。<br>所以，我们不仅用使用安全传输协议，还需要将cookie信息进行加密。</p>
+<p>我们进行如下改进，第一次请求时，我们依然会把用户名和密码存入数据库中，或者查询，看是否已经有这个用户，这是跟数据库的第一次交互。<br>然后我们使用一个密钥将用户名加密，将加密后的密文和用户名分别放入相应的cookie中。而在之后的请求中，服务器端会将用户名再次用密钥进行加密，然后与cookie中的密文进行比较。这样就避免了多次访问数据库以及暴露密码的问题。</p>
+<p>###Session<br>在每个context对象，即每个web app都具有一个独立的manager对象。通过server.xml可以配置定制化的manager，也可以不配置。不管怎样，在生成context对象时，都会生成一个manager对象。缺省的是StandardManager类。相应的代码在ContextRuleSet的addRuleInstances方法中。涉及到Digester解析XML的知识,这方面的知识要赶紧啃了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">digester.addObjectCreate(prefix + <span class="string">"Context/Manager"</span>,</span><br><span class="line">                         <span class="string">"org.apache.catalina.session.StandardManager"</span>,</span><br><span class="line">                         <span class="string">"className"</span>);</span><br><span class="line">digester.addSetProperties(prefix + <span class="string">"Context/Manager"</span>);</span><br><span class="line">digester.addSetNext(prefix + <span class="string">"Context/Manager"</span>,</span><br><span class="line">                    <span class="string">"setManager"</span>,</span><br><span class="line">                    <span class="string">"org.apache.catalina.Manager"</span>);</span><br><span class="line"></span><br><span class="line">digester.addObjectCreate(prefix + <span class="string">"Context/Manager/Store"</span>,</span><br><span class="line">                         <span class="keyword">null</span>, <span class="comment">// MUST be specified in the element</span></span><br><span class="line">                         <span class="string">"className"</span>);</span><br><span class="line">digester.addSetProperties(prefix + <span class="string">"Context/Manager/Store"</span>);</span><br><span class="line">digester.addSetNext(prefix + <span class="string">"Context/Manager/Store"</span>,</span><br><span class="line">                    <span class="string">"setStore"</span>,</span><br><span class="line">                    <span class="string">"org.apache.catalina.Store"</span>);</span><br><span class="line"></span><br><span class="line">digester.addObjectCreate(prefix + <span class="string">"Context/Manager/SessionIdGenerator"</span>,</span><br><span class="line">                         <span class="string">"org.apache.catalina.util.StandardSessionIdGenerator"</span>,</span><br><span class="line">                         <span class="string">"className"</span>);</span><br><span class="line">digester.addSetProperties(prefix + <span class="string">"Context/Manager/SessionIdGenerator"</span>);</span><br><span class="line">digester.addSetNext(prefix + <span class="string">"Context/Manager/SessionIdGenerator"</span>,</span><br><span class="line">                    <span class="string">"setSessionIdGenerator"</span>,</span><br><span class="line">                    <span class="string">"org.apache.catalina.SessionIdGenerator"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>第一次请求过来是不会带有Cookie的，也就不会有jsessionId出现。Session其实也是一种Cookie。请求过来后，服务器端就会为这个请求的客户机加上Cookie作为标识了。</p>
+<p>browser发送Http request；<br>tomcat内核Http11Processor会从HTTP request中解析出“jsessionid”(具体的解析过程为先从request的URL中解析，这是为了有的浏览器把cookie功能禁止后，将URL重写考虑的，如果解析不出来，再从cookie中解析相应的jsessionid)，解析完后封装成一个request对象(当然还有其他的http header)；<br>servlet中获取session，其过程是根据刚才解析得到的jsessionid(如果有的话)，从session池(session maps)中获取相应的session对象；这个地方有个逻辑，就是如果jsessionid为空的话(或者没有其对应的session对象，或者有session对象，但此对象已经过期超时)，可以选择创建一个session，或者不创建；<br>如果创建新session，则将session放入session池中，同时将与其相对应的jsessionid写入cookie通过Http response header的方式发送给browser，然后重复第一步。</p>
+<p>以上是session的获取及创建过程。在servlet中获取session，通常是调用request的getSession方法。这个方法需要传入一个boolean参数，这个参数就是实现刚才说的，当jsessionid为空或从session池中获取不到相应的session对象时，选择创建一个新的session还是不创建。 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">protected</span> Session <span class="title">doGetSession</span><span class="params">(<span class="keyword">boolean</span> create)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// There cannot be a session if no context has been assigned yet</span></span><br><span class="line">     Context context = getContext();</span><br><span class="line">     <span class="keyword">if</span> (context == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span> (<span class="keyword">null</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//如果有session存在但是无效</span></span><br><span class="line">     <span class="comment">// Return the current session if it exists and is valid</span></span><br><span class="line">     <span class="keyword">if</span> ((session != <span class="keyword">null</span>) &amp;&amp; !session.isValid()) &#123;</span><br><span class="line">         session = <span class="keyword">null</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//如果有效，直接返回</span></span><br><span class="line">     <span class="keyword">if</span> (session != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span> (session);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//       获取所在context的manager对象   </span></span><br><span class="line"></span><br><span class="line">     <span class="comment">// Return the requested session if it exists and is valid</span></span><br><span class="line">     Manager manager = context.getManager();</span><br><span class="line">     <span class="keyword">if</span> (manager == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">null</span>;        <span class="comment">// Sessions are not supported</span></span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//requestedSessionId就是从Http request中解析出来的  </span></span><br><span class="line">     <span class="keyword">if</span> (requestedSessionId != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">try</span> &#123;</span><br><span class="line">             session = manager.findSession(requestedSessionId);</span><br><span class="line">         &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">             session = <span class="keyword">null</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="comment">//如果存在但无效</span></span><br><span class="line">         <span class="keyword">if</span> ((session != <span class="keyword">null</span>) &amp;&amp; !session.isValid()) &#123;</span><br><span class="line">             session = <span class="keyword">null</span>;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="comment">//如果有效，返回</span></span><br><span class="line">         <span class="keyword">if</span> (session != <span class="keyword">null</span>) &#123;</span><br><span class="line">         	<span class="comment">//session对象有效，记录此次访问时间  </span></span><br><span class="line"></span><br><span class="line">             session.access();</span><br><span class="line">             <span class="keyword">return</span> (session);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">// 如果参数是false，则不创建新session对象了，直接退出了  </span></span><br><span class="line"></span><br><span class="line">     <span class="comment">// Create a new session if requested and the response is not committed</span></span><br><span class="line">     <span class="keyword">if</span> (!create) &#123;</span><br><span class="line">         <span class="keyword">return</span> (<span class="keyword">null</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">if</span> ((response != <span class="keyword">null</span>) &amp;&amp;</span><br><span class="line">         context.getServletContext().getEffectiveSessionTrackingModes().</span><br><span class="line">                 contains(SessionTrackingMode.COOKIE) &amp;&amp;</span><br><span class="line">         response.getResponse().isCommitted()) &#123;</span><br><span class="line">         <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException</span><br><span class="line">           (sm.getString(<span class="string">"coyoteRequest.sessionCreateCommitted"</span>));</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//在非常有限的情况下重用客户端提供的会话id。</span></span><br><span class="line">     <span class="comment">// Re-use session IDs provided by the client in very limited</span></span><br><span class="line">     <span class="comment">// circumstances.</span></span><br><span class="line">     String sessionId = getRequestedSessionId();</span><br><span class="line">     <span class="keyword">if</span> (requestedSessionSSL) &#123;</span><br><span class="line">     	<span class="comment">//如果会话ID是从SSL握手获得的</span></span><br><span class="line">         <span class="comment">// If the session ID has been obtained from the SSL handshake then</span></span><br><span class="line">         <span class="comment">// use it.</span></span><br><span class="line">     &#125; </span><br><span class="line">     <span class="comment">//如果路径为/ ，且sessionId是从url中获得的，即url重写获得</span></span><br><span class="line">     <span class="keyword">else</span> <span class="keyword">if</span> ((<span class="string">"/"</span>.equals(context.getSessionCookiePath())</span><br><span class="line">             &amp;&amp; isRequestedSessionIdFromCookie())) &#123;</span><br><span class="line">             <span class="comment">/*</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">这是常见的(ish)用例:使用相同的会话ID。</span></span><br><span class="line"><span class="comment">同一主机上的多个web应用程序。通常这是</span></span><br><span class="line"><span class="comment">用于Portlet实现。只有在session会话通过cookie跟踪时才有效。</span></span><br><span class="line"><span class="comment">。cookie必须有一条“/”的路径。</span></span><br><span class="line"><span class="comment">否则不会提供给所有web应用程序的请求。</span></span><br><span class="line"><span class="comment">客户提供的任何会话ID都应该是一个会话。</span></span><br><span class="line"><span class="comment">已经存在于主机的某个地方。只有当上下文</span></span><br><span class="line"><span class="comment">被标识为要确认的时候才会检查。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">         <span class="comment">/* This is the common(ish) use case: using the same session ID with</span></span><br><span class="line"><span class="comment">          * multiple web applications on the same host. Typically this is</span></span><br><span class="line"><span class="comment">          * used by Portlet implementations. It only works if sessions are</span></span><br><span class="line"><span class="comment">          * tracked via cookies. The cookie must have a path of "/" else it</span></span><br><span class="line"><span class="comment">          * won't be provided for requests to all web applications.</span></span><br><span class="line"><span class="comment">          *</span></span><br><span class="line"><span class="comment">          * Any session ID provided by the client should be for a session</span></span><br><span class="line"><span class="comment">          * that already exists somewhere on the host. Check if the context</span></span><br><span class="line"><span class="comment">          * is configured for this to be confirmed.</span></span><br><span class="line"><span class="comment">          */</span></span><br><span class="line">         <span class="keyword">if</span> (context.getValidateClientProvidedNewSessionId()) &#123;</span><br><span class="line">             <span class="keyword">boolean</span> found = <span class="keyword">false</span>;</span><br><span class="line">             <span class="keyword">for</span> (Container container : getHost().findChildren()) &#123;</span><br><span class="line">                 Manager m = ((Context) container).getManager();</span><br><span class="line">                 <span class="keyword">if</span> (m != <span class="keyword">null</span>) &#123;</span><br><span class="line">                     <span class="keyword">try</span> &#123;</span><br><span class="line">                         <span class="keyword">if</span> (m.findSession(sessionId) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                             found = <span class="keyword">true</span>;</span><br><span class="line">                             <span class="keyword">break</span>;</span><br><span class="line">                         &#125;</span><br><span class="line">                     &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                         <span class="comment">// Ignore. Problems with this manager will be</span></span><br><span class="line">                         <span class="comment">// handled elsewhere.</span></span><br><span class="line">                     &#125;</span><br><span class="line">                 &#125;</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">if</span> (!found) &#123;</span><br><span class="line">                 sessionId = <span class="keyword">null</span>;</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         sessionId = <span class="keyword">null</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//创建一个session</span></span><br><span class="line">     session = manager.createSession(sessionId);</span><br><span class="line">     <span class="comment">// 将新session的jsessionid写入cookie，传给browser ，佐证了session也是cookie</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">     <span class="comment">// Creating a new session cookie based on that session</span></span><br><span class="line">     <span class="keyword">if</span> ((session != <span class="keyword">null</span>) &amp;&amp; (getContext() != <span class="keyword">null</span>)</span><br><span class="line">            &amp;&amp; getContext().getServletContext().</span><br><span class="line">                    getEffectiveSessionTrackingModes().contains(</span><br><span class="line">                            SessionTrackingMode.COOKIE)) &#123;</span><br><span class="line">         Cookie cookie =</span><br><span class="line">             ApplicationSessionCookieConfig.createSessionCookie(</span><br><span class="line">                     context, session.getIdInternal(), isSecure());</span><br><span class="line"></span><br><span class="line">         response.addSessionCookieInternal(cookie);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (session == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//记录访问时间</span></span><br><span class="line">     session.access();</span><br><span class="line">     <span class="keyword">return</span> session;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">session = manager.createSession(sessionId);</span><br></pre></td></tr></table></figure>
+<p> StandardManager父类ManagerBase中实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Session <span class="title">createSession</span><span class="params">(String sessionId)</span> </span>&#123;</span><br><span class="line">      </span><br><span class="line">      <span class="keyword">if</span> ((maxActiveSessions &gt;= <span class="number">0</span>) &amp;&amp;</span><br><span class="line">              (getActiveSessions() &gt;= maxActiveSessions)) &#123;</span><br><span class="line">          rejectedSessions++;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> TooManyActiveSessionsException(</span><br><span class="line">                  sm.getString(<span class="string">"managerBase.createSession.ise"</span>),</span><br><span class="line">                  maxActiveSessions);</span><br><span class="line">      &#125;</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// Recycle or create a Session instance</span></span><br><span class="line">      Session session = createEmptySession();</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Initialize the properties of the new session and return it</span></span><br><span class="line">      session.setNew(<span class="keyword">true</span>);</span><br><span class="line">      session.setValid(<span class="keyword">true</span>);</span><br><span class="line">      session.setCreationTime(System.currentTimeMillis());</span><br><span class="line">      session.setMaxInactiveInterval(((Context) getContainer()).getSessionTimeout() * <span class="number">60</span>);</span><br><span class="line">      String id = sessionId;</span><br><span class="line">      <span class="keyword">if</span> (id == <span class="keyword">null</span>) &#123;</span><br><span class="line">      	<span class="comment">//会去重</span></span><br><span class="line">          id = generateSessionId();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//在这里将session放入sessions中</span></span><br><span class="line">      session.setId(id);</span><br><span class="line">      sessionCounter++;</span><br><span class="line"></span><br><span class="line">      SessionTiming timing = <span class="keyword">new</span> SessionTiming(session.getCreationTime(), <span class="number">0</span>);</span><br><span class="line">      <span class="keyword">synchronized</span> (sessionCreationTiming) &#123;</span><br><span class="line">          sessionCreationTiming.add(timing);</span><br><span class="line">          sessionCreationTiming.poll();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> (session);</span><br><span class="line"></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>生产id的方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> String <span class="title">generateSessionId</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    String result = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// Not thread-safe but if one of multiple increments is lost</span></span><br><span class="line">            <span class="comment">// that is not a big deal since the fact that there was any</span></span><br><span class="line">            <span class="comment">// duplicate is a much bigger issue.</span></span><br><span class="line">            duplicates++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        result = sessionIdGenerator.generateSessionId();</span><br><span class="line">        </span><br><span class="line">    &#125; <span class="keyword">while</span> (sessions.containsKey(result));</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用算法生成id,然后会在sessions这个map中查看是否有重复，起到去重的效果。</p>
+<p>###URL地址重写<br>URL地址重写是对客户端不支持Cookie的解决方案。URL地址重写的原理是将该用户Session的id信息重写到URL地址中。服务器能够解析重写后的URL获取Session的id。这样即使客户端不支持Cookie，也可以使用Session来记录用户状态。HttpServletResponse类提供了encodeURL(Stringurl)实现URL地址重写</p>
+<p>该方法会自动判断客户端是否支持Cookie。如果客户端支持Cookie，会将URL原封不动地输出来。如果客户端不支持Cookie，则会将用户Session的id重写到URL中。<br>增添的jsessionid字符串既不会影响请求的文件名，也不会影响提交的地址栏参数。用户单击这个链接的时候会把Session的id通过URL提交到服务器上，服务器通过解析URL地址获得Session的id。<br>对于WAP程序，由于大部分的手机浏览器都不支持Cookie，WAP程序都会采用URL地址重写来跟踪用户会话。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">response.encodeURL(<span class="string">"index.jsp?c=1&amp;wd=Java"</span>);</span><br><span class="line"><span class="comment">//用于重定向</span></span><br><span class="line">response.sendRedirect(response.encodeRedirectURL(“administrator.jsp”));</span><br></pre></td></tr></table></figure>
+<p><strong>encodeURL</strong>       org.apache.catalina.connector.Response(真正我们用户能看到的HttpServletResponse实现类是他的封装类ResponseFacade)<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> String <span class="title">encodeURL</span><span class="params">(String url)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">       String absolute;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           absolute = toAbsolute(url);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IllegalArgumentException iae) &#123;</span><br><span class="line">           <span class="comment">// Relative URL</span></span><br><span class="line">           <span class="keyword">return</span> url;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> (isEncodeable(absolute)) &#123;</span><br><span class="line">           <span class="comment">// W3c spec clearly said</span></span><br><span class="line">           <span class="keyword">if</span> (url.equalsIgnoreCase(<span class="string">""</span>)) &#123;</span><br><span class="line">               url = absolute;</span><br><span class="line">           &#125; <span class="keyword">else</span> <span class="keyword">if</span> (url.equals(absolute) &amp;&amp; !hasPath(url)) &#123;</span><br><span class="line">               url += <span class="string">'/'</span>;</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> (toEncoded(url, request.getSessionInternal().getIdInternal()));</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> (url);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>关键在toEncoded<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">protected</span> String <span class="title">toEncoded</span><span class="params">(String url, String sessionId)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ((url == <span class="keyword">null</span>) || (sessionId == <span class="keyword">null</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> (url);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String path = url;</span><br><span class="line">        String query = <span class="string">""</span>;</span><br><span class="line">        String anchor = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">int</span> question = url.indexOf(<span class="string">'?'</span>);</span><br><span class="line">        <span class="keyword">if</span> (question &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            path = url.substring(<span class="number">0</span>, question);</span><br><span class="line">            query = url.substring(question);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> pound = path.indexOf(<span class="string">'#'</span>);</span><br><span class="line">        <span class="keyword">if</span> (pound &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            anchor = path.substring(pound);</span><br><span class="line">            path = path.substring(<span class="number">0</span>, pound);</span><br><span class="line">        &#125;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder(path);</span><br><span class="line">        <span class="keyword">if</span>( sb.length() &gt; <span class="number">0</span> ) &#123; <span class="comment">// jsessionid can't be first.</span></span><br><span class="line">            sb.append(<span class="string">";"</span>);</span><br><span class="line">            sb.append(SessionConfig.getSessionUriParamName(</span><br><span class="line">                    request.getContext()));</span><br><span class="line">            sb.append(<span class="string">"="</span>);</span><br><span class="line">            sb.append(sessionId);</span><br><span class="line">        &#125;</span><br><span class="line">        sb.append(anchor);</span><br><span class="line">        sb.append(query);</span><br><span class="line">        <span class="keyword">return</span> (sb.toString());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SessionConfig.getSessionUriParamName(</span><br><span class="line">request.getContext()));</span><br></pre></td></tr></table></figure>
+<p>  调用了这个方法来获取jsessionId<br>  具体获取方法有兴趣的可以深入研究。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/17/session/" data-id="cjcj5a2ja0000lobzn8o9nly1" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/01/14/对classpath的理解/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">对classpath的理解</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/17/session/">Cookie和Session</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/14/对classpath的理解/">对classpath的理解</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/11/Spring配置文件解析(一)/">Spring之BeanFactoryPostProcessor</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/08/--SpringMVC请求处理之对方法参数的处理/">SpringMVC请求处理之对方法参数的处理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/08/--SpringMVC配置文件详解（六）/">SpringMVC配置文件详解（六）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
