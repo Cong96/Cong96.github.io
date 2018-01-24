@@ -69,6 +69,58 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-LinkedBlokingQueue" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/13/LinkedBlokingQueue/" class="article-date">
+  <time datetime="2017-12-13T12:49:07.048Z" itemprop="datePublished">2017-12-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/13/LinkedBlokingQueue/">LinkedBlokingQueue</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<p>LinkedBlockingQueue的底层数据结构是链表，但是和LinkedList的双向链表不同，LinkedBlockingQueue的底层数据结构是单向链表，包含头结点和尾节点。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">LinkedBlockingQueue</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (capacity &lt;= <span class="number">0</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException();</span><br><span class="line">    <span class="keyword">this</span>.capacity = capacity;</span><br><span class="line">    last = head = <span class="keyword">new</span> Node&lt;E&gt;(<span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>offer()</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">offer</span><span class="params">(E e)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (e == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">  <span class="comment">//这里使用了AtomicInteger来波保证更改队列元素个数时的原子性，</span></span><br><span class="line">      <span class="keyword">final</span> AtomicInteger count = <span class="keyword">this</span>.count;</span><br><span class="line">  <span class="comment">//队列满，返回false</span></span><br><span class="line">      <span class="keyword">if</span> (count.get() == capacity)</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  <span class="comment">//否则，开始入队操作</span></span><br><span class="line">      <span class="keyword">int</span> c = -<span class="number">1</span>;</span><br><span class="line">      Node&lt;E&gt; node = <span class="keyword">new</span> Node&lt;E&gt;(e);</span><br><span class="line">  <span class="comment">//尝试获取putLock</span></span><br><span class="line">      <span class="keyword">final</span> ReentrantLock putLock = <span class="keyword">this</span>.putLock;</span><br><span class="line">      putLock.lock();</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//如果没有满，执行入队操作</span></span><br><span class="line">          <span class="keyword">if</span> (count.get() &lt; capacity) &#123;</span><br><span class="line">              enqueue(node);</span><br><span class="line">            <span class="comment">//然后修改count的值，保证原子性,该方法返回修改之前的值，</span></span><br><span class="line">              c = count.getAndIncrement();</span><br><span class="line">            <span class="comment">//所以在这里需要使用c+1(因为当前的count值最大是为c+1，在期间没有出队操作的情况下)  来判断是否队满</span></span><br><span class="line">              <span class="keyword">if</span> (c + <span class="number">1</span> &lt; capacity)</span><br><span class="line">               <span class="comment">//没有满，则唤醒notFull</span></span><br><span class="line">                notFull.signal();</span><br><span class="line">          &#125;</span><br><span class="line">      &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="comment">//释放锁</span></span><br><span class="line">          putLock.unlock();</span><br><span class="line">      &#125;</span><br><span class="line">  <span class="comment">//如果当前的值是0，则唤醒notEmpty</span></span><br><span class="line">      <span class="keyword">if</span> (c == <span class="number">0</span>)</span><br><span class="line">          signalNotEmpty();</span><br><span class="line">      <span class="keyword">return</span> c &gt;= <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">enqueue</span><span class="params">(Node&lt;E&gt; node)</span> </span>&#123;</span><br><span class="line">      <span class="comment">// assert putLock.isHeldByCurrentThread();</span></span><br><span class="line">      <span class="comment">// assert last.next == null;</span></span><br><span class="line">    <span class="comment">//   a=b=c   a=(b=c)  就是先对b进行赋值操作，然后再返回值赋给a</span></span><br><span class="line">    <span class="comment">// last.next=node;</span></span><br><span class="line">    <span class="comment">//last=last.next;</span></span><br><span class="line">      last = last.next = node;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>我们知道LinkedBlockingQueue的设计是使用了putLock，takeLock两把独占锁，分别配合notFull这个Condition变量和notEmpty实现的。首先这就意味着读写操作是可以同时进行的，入队操作和出队操作是不会阻塞的，而在ArrayBlocking中只是用了一个独占锁，而且操作的是数组，所以也就是导致了入队操作和出队操作是不可以同时进行的。</p>
+<p>而由于</p>
+<p>正是由于底层数据结构的不同，才导致他们实现线程安全的形式不同，</p>
+<p>因为ArrayBlockingQueue的底层结构是数组，所以出队和入队是一定要相互阻塞的。</p>
+<p>而LinkedBlockingQueue的底层实现是个单向链表，而且是包含头结点和尾节点的。这就意味着出队和入队是可以不互相阻塞的，所以就使用了两个独占锁</p>
+<p><strong>poll()</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> E <span class="title">poll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> AtomicInteger count = <span class="keyword">this</span>.count;</span><br><span class="line">        <span class="keyword">if</span> (count.get() == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        E x = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">int</span> c = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">final</span> ReentrantLock takeLock = <span class="keyword">this</span>.takeLock;</span><br><span class="line">        takeLock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (count.get() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                x = dequeue();</span><br><span class="line">                c = count.getAndDecrement();</span><br><span class="line">                <span class="keyword">if</span> (c &gt; <span class="number">1</span>)</span><br><span class="line">                    notEmpty.signal();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            takeLock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (c == capacity)</span><br><span class="line">            signalNotFull();</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">   <span class="function"><span class="keyword">private</span> E <span class="title">dequeue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// assert takeLock.isHeldByCurrentThread();</span></span><br><span class="line">        <span class="comment">// assert head.item == null;</span></span><br><span class="line">        Node&lt;E&gt; h = head;</span><br><span class="line">        Node&lt;E&gt; first = h.next;</span><br><span class="line">        h.next = h; <span class="comment">// help GC</span></span><br><span class="line">        head = first;</span><br><span class="line">        E x = first.item;</span><br><span class="line">        first.item = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">        E item;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * One of:</span></span><br><span class="line"><span class="comment">         * - the real successor Node</span></span><br><span class="line"><span class="comment">         * - this Node, meaning the successor is head.next</span></span><br><span class="line"><span class="comment">         * - null, meaning there is no successor (this is the last node)</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        Node&lt;E&gt; next;</span><br><span class="line"></span><br><span class="line">        Node(E x) &#123; item = x; &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2017/12/13/LinkedBlokingQueue/" data-id="cjb52pqyx0005gkbz70eefrnd" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post---ArrayBlockingQueue" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/13/--ArrayBlockingQueue/" class="article-date">
@@ -933,101 +985,6 @@
 
 
   
-    <article id="post-Memory Leak" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/11/29/Memory Leak/" class="article-date">
-  <time datetime="2017-11-29T13:13:04.268Z" itemprop="datePublished">2017-11-29</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/11/29/Memory Leak/">Memory</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <hr>
-<h3 id="内存的释放"><a href="#内存的释放" class="headerlink" title="内存的释放"></a>内存的释放</h3><p>  内存的释放，也即清理那些不可达的对象，是由GC决定和执行的，所以GC会监控每一个对象的状态，包括申请、引用、被引用和赋值等。<strong>释放对象的根本原则就是对象不会再被使用</strong>：</p>
-<ul>
-<li>​    给对象赋予了空值null，之后再没有调用过。</li>
-<li>​    另一个是给对象赋予了新值，这样重新分配了内存空间。</li>
-</ul>
-<p>​    通常，会认为在堆上分配对象的代价比较大，但是GC却优化了这一操作：C++中，在堆上分配一块内存，会查找一块适用的内存加以分配，如果对象销毁，这块内存就可以重用；而Java中，就想一条长的带子，每分配一个新的对象，Java的“堆指针”就向后移动到尚未分配的区域。所以，Java分配内存的效率，可与C++媲美。</p>
-<p>​    但是这种工作方式有一个问题：如果频繁的申请内存，资源将会耗尽。这时GC就介入了进来，它会回收空间，并使堆中的对象排列更紧凑。这样，就始终会有足够大的内存空间可以分配。</p>
-<p>​    gc清理时的引用计数方式：当引用连接至新对象时，引用计数+1；当某个引用离开作用域或被设置为null时，引用计数-1，GC发现这个计数为0时，就回收其占用的内存。这个开销会在引用程序的整个生命周期发生，并且不能处理循环引用的情况。所以这种方式只是用来说明GC的工作方式，而不会被任何一种Java虚拟机应用。</p>
-<p>​    多数GC采用一种自适应的清理方式（加上其他附加的用于提升速度的技术），主要依据是找出任何“活”的对象，然后采用“自适应的、分代的、停止-复制、标记-清理”式的垃圾回收器。具体不介绍太多，这不是本文重点。</p>
-<h3 id="Java中的内存泄漏"><a href="#Java中的内存泄漏" class="headerlink" title="Java中的内存泄漏"></a>Java中的内存泄漏</h3><p>​    Java中的内存泄露，广义并通俗的说，就是：不再会被使用的对象的内存不能被回收，就是内存泄露。</p>
-<p>Java中的内存泄露与C++中的表现有所不同。</p>
-<p>​    在C++中，所有被分配了内存的对象，不再使用后，都必须程序员手动的释放他们。所以，每个类，都会含有一个析构函数，作用就是完成清理工作，如果我们忘记了某些对象的释放，就会造成内存泄露。</p>
-<p>​    但是在Java中，我们不用（也没办法）自己释放内存，无用的对象由GC自动清理，这也极大的简化了我们的编程工作。但，实际有时候一些不再会被使用的对象，在GC看来不能被释放，就会造成内存泄露。</p>
-<p>​    我们知道，对象都是有生命周期的，有的长，有的短，<strong>如果长生命周期的对象持有短生命周期的引用，就很可能会出现内存泄露</strong>。</p>
-<p>For Example:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">pop</span><span class="params">()</span></span>&#123;</span><br><span class="line">     <span class="keyword">if</span>(size == <span class="number">0</span>)</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">     <span class="keyword">else</span></span><br><span class="line">         <span class="keyword">return</span> (E) elementData[--size];</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<p>Should Be</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">pop</span><span class="params">()</span></span>&#123;</span><br><span class="line">      <span class="keyword">if</span>(size == <span class="number">0</span>)</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">      <span class="keyword">else</span>&#123;</span><br><span class="line">          E e = (E) elementData[--size];</span><br><span class="line">          elementData[size] = <span class="keyword">null</span>;</span><br><span class="line">          <span class="keyword">return</span> e;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<h3 id="How-To-Fix-Memory-Leak"><a href="#How-To-Fix-Memory-Leak" class="headerlink" title="How To Fix Memory Leak"></a>How To Fix Memory Leak</h3><p>我们知道Java语言中，内存管理是交给JVM实现的，那么如果我们想一定程度上控制内存管理，以达到解决内存泄漏的问题呢？Java给我们提供了相关的API，我们来看下他们可以提供那些功能，看看靠不靠谱，能不能解决内存泄漏的问题。</p>
-<ul>
-<li><p>gc()</p>
-<p>先看System.gc()的API</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">运行垃圾回收器。 </span><br><span class="line">调用 gc 方法暗示着 Java 虚拟机做了一些努力来回收未用对象，以便能够快速地重用这些对象当前占用的内存。当控制权从方法调用中返回时，虚拟机已经尽最大努力从所有丢弃的对象中回收了空间。 </span><br><span class="line"></span><br><span class="line">调用 System.gc() 实际上等效于调用： </span><br><span class="line"></span><br><span class="line"> Runtime.getRuntime().gc()</span><br></pre></td></tr></table></figure>
-<p>我们看到上面的描述是说JVM努力回收未用对象，JVM已经尽最大努力从所有丢弃的对象中回收了空间。这是什么意思呢，这就是告诉我们，我这个方法不一定靠谱，我只是尽力回收，不能保证一定回收。</p>
-<p>为什么只是尽力而不能确保呢：因为，不同的JVM实现者可能使用不同的算法管理GC。通常，GC的线程的优先级别较低。JVM调用GC的策略也有很多种，有的是内存使用到达一定程度时，GC才开始工作，也有定时执行的，有的是平缓执行GC，有的是中断式执行GC。但通常来说，我们不需要关心这些。除非在一些特定的场合，GC的执行影响应用程序的性能，例如对于基于Web的实时系统，如网络游戏等，用户不希望GC突然中断应用程序执行而进行垃圾回收，那么我们需要调整GC的参数，让GC能够通过平缓的方式释放内存，例如将垃圾回收分解为一系列的小步骤执行，Sun提供的HotSpot JVM就支持这一特性。</p>
-</li>
-<li><p><strong>finalize()</strong></p>
-<p>Object finalize()  Explain in Java API</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">当垃圾回收器确定不存在对该对象的更多引用时，由对象的垃圾回收器调用此方法。子类重写 finalize 方法，以配置系统资源或执行其他清除。 </span><br><span class="line">finalize 的常规协定是：当 JavaTM 虚拟机已确定尚未终止的任何线程无法再通过任何方法访问此对象时，将调用此方法，除非由于准备终止的其他某个对象或类的终结操作执行了某个操作。finalize 方法可以采取任何操作，其中包括再次使此对象对其他线程可用；不过，finalize 的主要目的是在不可撤消地丢弃对象之前执行清除操作。例如，表示输入/输出连接的对象的 finalize 方法可执行显式 I/O 事务，以便在永久丢弃对象之前中断连接。 </span><br><span class="line"></span><br><span class="line">Object 类的 finalize 方法执行非特殊性操作；它仅执行一些常规返回。Object 的子类可以重写此定义。 </span><br><span class="line"></span><br><span class="line">Java 编程语言不保证哪个线程将调用某个给定对象的 finalize 方法。但可以保证在调用 finalize 时，调用 finalize 的线程将不会持有任何用户可见的同步锁定。如果 finalize 方法抛出未捕获的异常，那么该异常将被忽略，并且该对象的终结操作将终止。 </span><br><span class="line"></span><br><span class="line">在启用某个对象的 finalize 方法后，将不会执行进一步操作，直到 Java 虚拟机再次确定尚未终止的任何线程无法再通过任何方法访问此对象，其中包括由准备终止的其他对象或类执行的可能操作，在执行该操作时，对象可能被丢弃。 </span><br><span class="line"></span><br><span class="line">对于任何给定对象，Java 虚拟机最多只调用一次 finalize 方法。 </span><br><span class="line"></span><br><span class="line">finalize 方法抛出的任何异常都会导致此对象的终结操作停止，但可以通过其他方法忽略它。</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">​</span><br><span class="line"></span><br><span class="line">**finalize 的常规协定是：当 JavaTM 虚拟机已确定尚未终止的任何线程无法再通过任何方法访问此对象时，将调用此方法，除非由于准备终止的其他某个对象或类的终结操作执行了某个操作。finalize 方法可以采取任何操作，其中包括再次使此对象对其他线程可用；不过，finalize 的主要目的是在不可撤消地丢弃对象之前执行清除操作。例如，表示输入/输出连接的对象的 finalize 方法可执行显式 I/O 事务，以便在永久丢弃对象之前中断连接。 **</span><br><span class="line"></span><br><span class="line">​</span><br><span class="line"></span><br><span class="line">在 C/C++、Pascal和其他几种多种用途的编程语言中，开发者有责任在内存管理上发挥积极的作用。例如，如果你为一个对象或数据结构分配了内存，那么当你不再使用它时必须释放掉该内存。</span><br><span class="line"></span><br><span class="line">在 Java 中，当你创建一个对象时，Java 虚拟机（JVM）为该对象分配内存、调用构造函数并开始跟踪你使用的对象。当你停止使用一个对象（就是说，当没有对该对象有效的引用时），JVM 通过垃圾回收器将该对象标记为释放状态。</span><br><span class="line"></span><br><span class="line">当垃圾回收器将要释放一个对象的内存时，它调用该对象的finalize() 方法（如果该对象定义了此方法）。垃圾回收器以独立的低优先级的方式运行，只有当其他线程挂起等待该内存释放的情况出现时，它才开始运行释放对象的内存。（事实上，你可以调用System.gc() 方法强制垃圾回收器来释放这些对象的内存。）</span><br><span class="line"></span><br><span class="line">在以上的描述中，有一些重要的事情需要注意。首先，只有当垃圾回收器释放该对象的内存时，才会执行finalize()。如果在 Applet 或应用程序退出之前垃圾回收器没有释放内存，垃圾回收器将不会调用finalize()。</span><br><span class="line"></span><br><span class="line">其次，除非垃圾回收器认为你的 Applet 或应用程序需要额外的内存，否则它不会试图释放不再使用的对象的内存。换句话说，这是完全可能的：一个 Applet 给少量的对象分配内存，没有造成严重的内存需求，于是垃圾回收器没有释放这些对象的内存就退出了。</span><br><span class="line"></span><br><span class="line">**显然，如果你为某个对象定义了finalize() 方法，JVM 可能不会调用它，因为垃圾回收器不曾释放过那些对象的内存。调用System.gc() 也不会起作用，因为它仅仅是给 JVM 一个建议而不是命令。**</span><br><span class="line"></span><br><span class="line">如果finalize() 不是析构函数，JVM 不一定会调用它，你可能会疑惑它是否在任何情况下都有好处。事实上，在 Java 1.0 中它并没有太多的优点。</span><br><span class="line"></span><br><span class="line">根据 Java 文档，finalize() 是一个用于释放非 Java 资源的方法。但是，**JVM 有很大的可能不调用对象的finalize() 方法，因此很难证明使用该方法释放资源是有效的。**</span><br><span class="line"></span><br><span class="line">Java 1.1 通过提供一个System.runFinalizersOnExit() 方法部分地解决了这个问题。（不要将这个方法与 Java 1.0 中的System.runFinalizations() 方法相混淆。）不象System.gc() 方法那样，System.runFinalizersOnExit() 方法并不立即试图启动垃圾回收器。而是当应用程序或 Applet 退出时，它调用每个对象的finalize() 方法。</span><br><span class="line"></span><br><span class="line">正如你可能猜测的那样，通过调用System.runFinalizersOnExit() 方法强制垃圾回收器清除所有独立对象的内存，当清除代码执行时可能会引起明显的延迟。现在建立一个示例 Applet 来演示 Java 垃圾回收器和finalize() 方法是如何相互作用的。</span><br><span class="line"></span><br><span class="line">我们看FileInputStream这个类就重写了finalize()</span><br><span class="line"></span><br><span class="line">```java</span><br><span class="line">    protected void finalize() throws IOException &#123;</span><br><span class="line">        if ((fd != null) &amp;&amp;  (fd != FileDescriptor.in)) &#123;</span><br><span class="line">            /* if fd is shared, the references in FileDescriptor</span><br><span class="line">             * will ensure that finalizer is only called when</span><br><span class="line">             * safe to do so. All references using the fd have</span><br><span class="line">             * become unreachable. We can call close()</span><br><span class="line">             */</span><br><span class="line">            close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>API Document给出的解释是：确保在不再引用文件输入流时调用其 close 方法。 </p>
-<p>但是在上面我们已经分析过了，如果你为某个对象定义了finalize() 方法，JVM 可能不会调用它，因为垃圾回收器不曾释放过那些对象的内存。调用System.gc() 也不会起作用，因为它仅仅是给 JVM 一个建议而不是命令。也就是说，即使你的想法很美好，在finalize里执行了close方法，想来保证再不使用这个对象的时候能够确保关闭资源，但是很遗憾的是，即使不再使用这个对象了，也无法保证这个finalize方法会成功运行。finalize的运行和GC垃圾回收器有关，但是遗憾的是即使你显示的调用System.gc()来视图触发JVM来执行垃圾回收的动作，但是事实却往往不如我们所愿，GC回收操作可能并不会执行，也就意味着这个文件输入流资源一直会被占用，不被释放掉。</p>
-<p>我们回想我们学习FileInputStream的时候，我们要求在使用完毕这个对象的时候一定要确保程序调用close方法来关闭资源。</p>
-<p>还记得我们是怎样确保一定关闭资源的吗。</p>
-<p>使用try-finally结构实现。</p>
-<p>​</p>
-</li>
-</ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>1.Java语言与C++等不同，Java程序员是无法参与内存管理的，内存管理由JVM完成。</p>
-<p>在 Java 中，当你创建一个对象时，Java 虚拟机（JVM）为该对象分配内存、调用构造函数并开始跟踪你使用的对象。当你停止使用一个对象（就是说，当没有对该对象有效的引用时），JVM 通过垃圾回收器将该对象标记为释放状态。</p>
-<p>2.gc()和finalize() 不可靠，具体还是要看JVM的。这两个方法都不一定会起到我们预想的作用，很多时候是不能，所以并不建议使用。</p>
-<p>3.到底如何避免内存泄漏呢</p>
-<p>为了避免内存泄漏，我们应该将不用的对象都显式的置为null。</p>
-<p>但是将对象设置为null，会减少内存占用吗？</p>
-<p>但是你置为null了，就会马上释放内存吗？很显然还是不会的呀，我们无法预知GC到底什么时候来回收，所以不能避免。</p>
-<p>但是，并不能说置为null是毫无用处的。</p>
-<p>以下来源于知乎：</p>
-<ul>
-<li>手动设置null对释放对象有用，但用处不大，如果手动设置到自动设置（局部变量消亡或者被设置成其它值）之间发生了GC，那就有用，没发生GC就没用。</li>
-<li>但是已经分配给new Object()的内存还是存在的，只是没有了引用指向这块内存，会被系统优先GC（但是不定时）。另外，设置NULL我觉得纯属于好习惯，避免后面胡乱使用而已。</li>
-<li>不会，设置为null，只是栈中指向的引用为Null，但是new出来的对象还是存在于堆里面的，按照目前的GC算法。要等survior1 or survior2满的时候，JVM才会调用GC命令清除对应survior区的对象，将没有栈指向的对象给回收掉。所以回收内存不是实时的，要看survior区的大小和应用中创建对象的速度来看。</li>
-</ul>
-<p>可以得出结论：</p>
-<p> 设置为null无法减少内存占用，但是他应该是可以加快垃圾回收的。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://cong96.github.io/2017/11/29/Memory Leak/" data-id="cjb52pqz8000bgkbz4k7olns3" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 
   <nav id="page-nav">
@@ -1041,7 +998,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">分类</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js-css/">js&&css</a></li></ul>
     </div>
   </div>
 
@@ -1069,6 +1026,10 @@
       <ul>
         
           <li>
+            <a href="/2018/01/24/--CSS笔记（一）/">CSS笔记（一）</a>
+          </li>
+        
+          <li>
             <a href="/2018/01/24/--JDK1.8中接口的新特性/">JDK1.8中接口的新特性</a>
           </li>
         
@@ -1082,10 +1043,6 @@
         
           <li>
             <a href="/2018/01/17/session/">Cookie和Session</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/14/对classpath的理解/">对classpath的理解</a>
           </li>
         
       </ul>
