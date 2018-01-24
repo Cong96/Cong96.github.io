@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JDK1.8中接口的新特性 | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言昨天在牛客网做题，有一道题叫做在JDK8的环境下，接口能不能有具体的方法实现还是只能有抽象方法。 当然原题是个选择题，问法也不是这样问的。如果是这样问的，大家肯定都会想着是不是JDK8有更改了，接口里不只是可以有抽象方法了，也可以有具体的实现了，是的，确实是这样。我们今天就来看看下JDK8中接口的新特性。 JDK8">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JDK1.8中接口的新特性">
+<meta property="og:url" content="https://cong96.github.io/2018/01/24/--JDK1.8中接口的新特性/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言昨天在牛客网做题，有一道题叫做在JDK8的环境下，接口能不能有具体的方法实现还是只能有抽象方法。 当然原题是个选择题，问法也不是这样问的。如果是这样问的，大家肯定都会想着是不是JDK8有更改了，接口里不只是可以有抽象方法了，也可以有具体的实现了，是的，确实是这样。我们今天就来看看下JDK8中接口的新特性。 JDK8中接口的新特性在JDK8环境中，接口中的方法不再是只能有抽象方法，他可以有静态">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-24T14:52:26.253Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JDK1.8中接口的新特性">
+<meta name="twitter:description" content="前言昨天在牛客网做题，有一道题叫做在JDK8的环境下，接口能不能有具体的方法实现还是只能有抽象方法。 当然原题是个选择题，问法也不是这样问的。如果是这样问的，大家肯定都会想着是不是JDK8有更改了，接口里不只是可以有抽象方法了，也可以有具体的实现了，是的，确实是这样。我们今天就来看看下JDK8中接口的新特性。 JDK8中接口的新特性在JDK8环境中，接口中的方法不再是只能有抽象方法，他可以有静态">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post---JDK1.8中接口的新特性" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/24/--JDK1.8中接口的新特性/" class="article-date">
+  <time datetime="2018-01-24T14:54:35.265Z" itemprop="datePublished">2018-01-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      JDK1.8中接口的新特性
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>昨天在牛客网做题，有一道题叫做在JDK8的环境下，接口能不能有具体的方法实现还是只能有抽象方法。</p>
+<p>当然原题是个选择题，问法也不是这样问的。如果是这样问的，大家肯定都会想着是不是JDK8有更改了，接口里不只是可以有抽象方法了，也可以有具体的实现了，是的，确实是这样。我们今天就来看看下JDK8中接口的新特性。</p>
+<h3 id="JDK8中接口的新特性"><a href="#JDK8中接口的新特性" class="headerlink" title="JDK8中接口的新特性"></a>JDK8中接口的新特性</h3><p>在JDK8环境中，接口中的方法不再是只能有抽象方法，他可以有静态方法和default方法。</p>
+<p>我们来看一个例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.wangcc.MyJavaSE.jdk8interface;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">NewInterface</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">staticMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"staticMethod"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">default</span> <span class="keyword">void</span> <span class="title">defaultMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"defaultMethod"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getInfo</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>给出一个接口，在JDK8的环境下，他可以拥有静态方法和default方法，所谓default方法既是使用default关键字来修饰的方法。一个接口可以有多个静态方法和default方法，没有个数限制。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.wangcc.MyJavaSE.jdk8interface;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleImpl</span> <span class="keyword">implements</span> <span class="title">NewInterface</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		System.out.println(<span class="string">"INFO"</span>);</span><br><span class="line">		defaultMethod();</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现类只需要实现它的抽象方法即可，JDK8中的接口愈发的像抽象类靠拢的感觉。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.wangcc.MyJavaSE.jdk8interface;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NewInterfaceTest</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		NewInterface.staticMethod();</span><br><span class="line">		<span class="keyword">new</span> SimpleImpl().defaultMethod();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关于静态方法和default方法的调用。</p>
+<p>对于静态方法，并没有特殊的地方，在接口中直接由接口名调用，不需要由接口实现类对象来调用。</p>
+<p>而对于default方法，很明显是需要实力对象来调用的。而且有一点需要特别注意。</p>
+<p>我们知道在Java中是单继承的，但是是可以实现多个接口的，所以，当一个类实现了多个接口之后，如果多个接口有着相同的default方法，即方法名和参数列表相同。那么此时就会出现问题，无法识别到底是调用的哪个接口的方法，这个时候就必须要在实现类里面显式重写default的方法，而关于default的方法的重写,我们在实现类中不需要继续出现default关键字也不能出现default关键字。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.wangcc.MyJavaSE.jdk8interface;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleImpl</span> <span class="keyword">implements</span> <span class="title">NewInterface</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">		System.out.println(<span class="string">"INFO"</span>);</span><br><span class="line">		defaultMethod();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">defaultMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"Impl default Method"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重写的default方法必须的访问权限必须是public，因为default方法除了没有显式的访问修饰符外，只能用public访问限定符来修饰，而我们知道在Java中，要重写一个方法，访问限定符一定要大于父类或者接口指定的访问限定符范围，而且方法声明处抛出的异常也要大于后者。所以访问权限必须是public。</p>
+<p>最后，当default方法和实现类继承的父类的方法同名时，优先调用父类的方法。</p>
+<h3 id="strictfp关键字"><a href="#strictfp关键字" class="headerlink" title="strictfp关键字"></a>strictfp关键字</h3><p>今天在看default关键字的时候无意中发现了还有一个名为strictfp的关键字，这个关键字可是之前从来都没有看过额。那今天碰到了就记录一下吧，目前的场景还没有用到过。</p>
+<p>自Java2以来，Java语言增加了一个关键字strictfp</p>
+<p>strictfp 的意思是FP-strict，也就是说精确浮点的意思。在Java虚拟机进行浮点运算时，如果没有指定strictfp关键字时，Java的编译器以及运 行环境在对浮点运算的表达式是采取一种近似于我行我素的行为来完成这些操作，以致于得到的结果往往无法令你满意。而一旦使用了strictfp来声明一个 类、接口或者方法时，那么所声明的范围内Java的编译器以及运行环境会完全依照浮点规范IEEE-754来执行。因此如果你想让你的浮点运算更加精确， 而且不会因为不同的硬件平台所执行的结果不一致的话，那就请用关键字strictfp。</p>
+<p>你可以将一个类、接口以及方法声明为strictfp，但是不允许对接口中的方法以及构造函数声明strictfp关键字。现在这句话就需要更改了，是不允许对接口中的抽象方法使用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/24/--JDK1.8中接口的新特性/" data-id="cjct6yxxe000044bzpl8htft7" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/01/21/Spring AOP源码​/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Spring AOP源码（一）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/24/--JDK1.8中接口的新特性/">JDK1.8中接口的新特性</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/21/Spring AOP源码​/">Spring AOP源码（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/21/--Spring源码之AOP/">Spring源码之AOP</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/17/session/">Cookie和Session</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/14/对classpath的理解/">对classpath的理解</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
