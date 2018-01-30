@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>DelegatingFilterProxy | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言最近可算把一个项目整完了，然后最近打算来消化下项目中不懂的地方。项目中用到了spring-security来做验证授权，这一块是自己的知识盲区。所以先就来攻克这一块。 我们都知道在使用spring-security的时候都需要在web.xml做如下配置，这样的配置就表明了spring-security实际上是通过过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DelegatingFilterProxy">
+<meta property="og:url" content="https://cong96.github.io/2018/01/31/DelegatingFilterProxy/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言最近可算把一个项目整完了，然后最近打算来消化下项目中不懂的地方。项目中用到了spring-security来做验证授权，这一块是自己的知识盲区。所以先就来攻克这一块。 我们都知道在使用spring-security的时候都需要在web.xml做如下配置，这样的配置就表明了spring-security实际上是通过过滤器来实现的，很显然利用Filter确实是最好的选择。那么到底是如何通过以下配">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-30T15:58:26.711Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DelegatingFilterProxy">
+<meta name="twitter:description" content="前言最近可算把一个项目整完了，然后最近打算来消化下项目中不懂的地方。项目中用到了spring-security来做验证授权，这一块是自己的知识盲区。所以先就来攻克这一块。 我们都知道在使用spring-security的时候都需要在web.xml做如下配置，这样的配置就表明了spring-security实际上是通过过滤器来实现的，很显然利用Filter确实是最好的选择。那么到底是如何通过以下配">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-DelegatingFilterProxy" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/DelegatingFilterProxy/" class="article-date">
+  <time datetime="2018-01-30T16:05:54.859Z" itemprop="datePublished">2018-01-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Spring/">Spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      DelegatingFilterProxy
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近可算把一个项目整完了，然后最近打算来消化下项目中不懂的地方。项目中用到了spring-security来做验证授权，这一块是自己的知识盲区。所以先就来攻克这一块。</p>
+<p>我们都知道在使用spring-security的时候都需要在web.xml做如下配置，这样的配置就表明了spring-security实际上是通过过滤器来实现的，很显然利用Filter确实是最好的选择。那么到底是如何通过以下配置，让过滤器和spring-security联系起来的呢，我们就来探讨一下，找到执行这一块的过程，接着，我们就使用spring-security的官方文档来一边学习一边看源码。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>springSecurityFilterChain<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>org.springframework.web.filter.DelegatingFilterProxy<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>springSecurityFilterChain<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="DelegatingFilterProxy"><a href="#DelegatingFilterProxy" class="headerlink" title="DelegatingFilterProxy"></a>DelegatingFilterProxy</h3><p>这个类的作用就和他的名字一样，他就是一个起代理作用的过滤器，而真正的拦截器当然就是是spring-security里面的配置咯。但是我们知道，过滤器是由Tomcat来解析加载的，跟Spring容器是没有关系的。</p>
+<p>所以我们就带着两个问题来看看这个类：</p>
+<p>0.该类是如何完成代理。</p>
+<p>1.是如何将过滤器和Spring容器结合起来的。</p>
+<p>我们看源码：</p>
+<p>先看父类GenericFilterBean</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">GenericFilterBean</span> <span class="keyword">implements</span></span></span><br><span class="line"><span class="class">		<span class="title">Filter</span>, <span class="title">BeanNameAware</span>, <span class="title">EnvironmentAware</span>, <span class="title">ServletContextAware</span>, <span class="title">InitializingBean</span>, <span class="title">DisposableBean</span> </span>&#123;</span><br></pre></td></tr></table></figure>
+<p>他的父类GenericFilterBean实现了很多接口，其中我们最熟悉的就是InitializingBean了。我们知道注入到Spring的Bean，在实例化之后，如果有实现InitializingBean接口的，会调用他的afterPropertiesSet方法。</p>
+<p>而我们也注意到虽然GenericFilterBean是一个抽象类，但是他显式的实现了Filter的init方法，而子类DelegatingFilterProxy并没有显式的实现init方法，所以，也就是说当我们向tomcat注册了DelegatingFilterProxy过滤器后，会调用该监过滤器的init方法，而实际上调用的是父类的init方法，我们来看看这个方法做了什么。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig filterConfig)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">	Assert.notNull(filterConfig, <span class="string">"FilterConfig must not be null"</span>);</span><br><span class="line">	<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">		logger.debug(<span class="string">"Initializing filter '"</span> + filterConfig.getFilterName() + <span class="string">"'"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>.filterConfig = filterConfig;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Set bean properties from init parameters.</span></span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		PropertyValues pvs = <span class="keyword">new</span> FilterConfigPropertyValues(filterConfig, <span class="keyword">this</span>.requiredProperties);</span><br><span class="line">		BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(<span class="keyword">this</span>);</span><br><span class="line">		ResourceLoader resourceLoader = <span class="keyword">new</span> ServletContextResourceLoader(filterConfig.getServletContext());</span><br><span class="line">		bw.registerCustomEditor(Resource.class, <span class="keyword">new</span> ResourceEditor(resourceLoader, <span class="keyword">this</span>.environment));</span><br><span class="line">		initBeanWrapper(bw);</span><br><span class="line">		bw.setPropertyValues(pvs, <span class="keyword">true</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">catch</span> (BeansException ex) &#123;</span><br><span class="line">		String msg = <span class="string">"Failed to set bean properties on filter '"</span> +</span><br><span class="line">			filterConfig.getFilterName() + <span class="string">"': "</span> + ex.getMessage();</span><br><span class="line">		logger.error(msg, ex);</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> NestedServletException(msg, ex);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Let subclasses do whatever initialization they like.</span></span><br><span class="line">	initFilterBean();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">		logger.debug(<span class="string">"Filter '"</span> + filterConfig.getFilterName() + <span class="string">"' configured successfully"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个init()方法主要前面很长一段代码，直到        initFilterBean();之前，都是用来获取Filter配置中的参数即init-param value的配置。我们需要关注的就是initFilterBean();方法，这个方法在父类中是一个抽象方法，具体的实现在</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initFilterBean</span><span class="params">()</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">	<span class="keyword">synchronized</span> (<span class="keyword">this</span>.delegateMonitor) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.delegate == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="comment">// If no target bean name specified, use filter name.</span></span><br><span class="line">			<span class="keyword">if</span> (<span class="keyword">this</span>.targetBeanName == <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">this</span>.targetBeanName = getFilterName();</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// Fetch Spring root application context and initialize the delegate early,</span></span><br><span class="line">			<span class="comment">// if possible. If the root application context will be started after this</span></span><br><span class="line">			<span class="comment">// filter proxy, we'll have to resort to lazy initialization.</span></span><br><span class="line">			WebApplicationContext wac = findWebApplicationContext();</span><br><span class="line">			<span class="keyword">if</span> (wac != <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">this</span>.delegate = initDelegate(wac);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们分析下这个方法</p>
+<p>0.首先要做一个同步操作。</p>
+<p>1.然后进入同步块，如果当前的代理对象为null，查看targetBeanName对象是否为null，targetBeanName属性可以通过在web.xml中的filter中的init-param中配置。一般我们不显式的配置。</p>
+<p>2.如果我们没有显式的配置的话，就调用getFilterName方法来得到targetBeanName:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> String <span class="title">getFilterName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> (<span class="keyword">this</span>.filterConfig != <span class="keyword">null</span> ? <span class="keyword">this</span>.filterConfig.getFilterName() : <span class="keyword">this</span>.beanName);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>方法很简单，如果这时我们没有在filter初始化参数中配置beanName的话，我们就取当前filterName，filterName是filter配置中必须要配置的。</p>
+<p>3.得到当前的spring上下文，因为当我们通过ContextLoaderListener这个监听器去初始化Spring容器的时候，会把根上下文当做一个attribute注入到servletContext（即servlet上下文）中，key为WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE，value为根上下文，而我们在过滤器中又能通过FIlterConfig.getServletContext去得到ServletContext，所以我们也就顺理成章的能得到spring上下文了。</p>
+<p>4.当前上下文不为空的时候，调用initDelegate(wac);来得到真正用来执行的过滤器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Filter <span class="title">initDelegate</span><span class="params">(WebApplicationContext wac)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">	Filter delegate = wac.getBean(getTargetBeanName(), Filter.class);</span><br><span class="line">	<span class="keyword">if</span> (isTargetFilterLifecycle()) &#123;</span><br><span class="line">		delegate.init(getFilterConfig());</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> delegate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法很简单，就是通过限定BeanName以及Bean的类型为Filter来获取bean，而这里的BeanName就是targetName,当没有在filter配置中配置的时候，我们直接用的是filterName，而我们这里的配置的filterName是springSecurityFilterChain。看到这里，你肯定能得出一个结论，<strong>那就是如果你不在filter里配置targetBeanName或者beanName的时候，你的filterName就必须是springSecurityFilterChain</strong>，否则，肯定就无法在Spring找到delegate对象了，而BeanName为springSecurityFilterChain的Bean对象肯定在我们配置spring-security配置的时候以默认的方式注入到了spring，只有这样才说的通。</p>
+<p>而对于DelegatingFilterProxy的dofilter方法，我们不用多看，猜也猜得到内部是调用delegate.dofilter方法。</p>
+<p>那文章的最后，我们就来找一下到底这个BeanName为springSecurityFilterChain的Bean对象是哪个把，也算为我们之后阅读spring-security模块的代码开个头。</p>
+<p>我们知道spring-security的配置是如下的形式：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag"><span class="attr">xmlns:security</span>=<span class="string">"http://www.springframework.org/schema/security"</span></span></span><br><span class="line"><span class="tag"><span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag"><span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="tag"><span class="string">		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">		http://www.springframework.org/schema/security</span></span></span><br><span class="line"><span class="tag"><span class="string">		http://www.springframework.org/schema/security/spring-security.xsd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">http</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">intercept-url</span> <span class="attr">pattern</span>=<span class="string">"/**"</span> <span class="attr">access</span>=<span class="string">"hasRole('USER')"</span>&gt;</span><span class="tag">&lt;/<span class="name">intercept-url</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">http</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>而且会使用spring-security命名空间。很明显又是使用了命名空间来解析xml配置。这里我们不赘述整个过程了，我们直接找到解析http节点的BeanDefinitionParser实现类。</p>
+<p>这个类就是org.springframework.security.config.http.HttpSecurityBeanDefinitionParser,我们直接看他的parse方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> BeanDefinition <span class="title">parse</span><span class="params">(Element element, ParserContext pc)</span> </span>&#123;</span><br><span class="line">	CompositeComponentDefinition compositeDef = <span class="keyword">new</span> CompositeComponentDefinition(</span><br><span class="line">			element.getTagName(), pc.extractSource(element));</span><br><span class="line">	pc.pushContainingComponent(compositeDef);</span><br><span class="line"></span><br><span class="line">	registerFilterChainProxyIfNecessary(pc, pc.extractSource(element));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Obtain the filter chains and add the new chain to it</span></span><br><span class="line">	BeanDefinition listFactoryBean = pc.getRegistry().getBeanDefinition(</span><br><span class="line">			BeanIds.FILTER_CHAINS);</span><br><span class="line">	List&lt;BeanReference&gt; filterChains = (List&lt;BeanReference&gt;) listFactoryBean</span><br><span class="line">			.getPropertyValues().getPropertyValue(<span class="string">"sourceList"</span>).getValue();</span><br><span class="line"></span><br><span class="line">	filterChains.add(createFilterChain(element, pc));</span><br><span class="line"></span><br><span class="line">	pc.popAndRegisterContainingComponent();</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法的具体实现我们先不分析，我们看到他的一个子方法</p>
+<p><strong>registerFilterChainProxyIfNecessary</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">registerFilterChainProxyIfNecessary</span><span class="params">(ParserContext pc, Object source)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (pc.getRegistry().containsBeanDefinition(BeanIds.FILTER_CHAIN_PROXY)) &#123;</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// Not already registered, so register the list of filter chains and the</span></span><br><span class="line">		<span class="comment">// FilterChainProxy</span></span><br><span class="line">		BeanDefinition listFactoryBean = <span class="keyword">new</span> RootBeanDefinition(ListFactoryBean.class);</span><br><span class="line">		listFactoryBean.getPropertyValues().add(<span class="string">"sourceList"</span>, <span class="keyword">new</span> ManagedList());</span><br><span class="line">		pc.registerBeanComponent(<span class="keyword">new</span> BeanComponentDefinition(listFactoryBean,</span><br><span class="line">				BeanIds.FILTER_CHAINS));</span><br><span class="line"></span><br><span class="line">		BeanDefinitionBuilder fcpBldr = BeanDefinitionBuilder</span><br><span class="line">				.rootBeanDefinition(FilterChainProxy.class);</span><br><span class="line">		fcpBldr.getRawBeanDefinition().setSource(source);</span><br><span class="line">		fcpBldr.addConstructorArgReference(BeanIds.FILTER_CHAINS);</span><br><span class="line">		fcpBldr.addPropertyValue(<span class="string">"filterChainValidator"</span>, <span class="keyword">new</span> RootBeanDefinition(</span><br><span class="line">				DefaultFilterChainValidator.class));</span><br><span class="line">		BeanDefinition fcpBean = fcpBldr.getBeanDefinition();</span><br><span class="line">		pc.registerBeanComponent(<span class="keyword">new</span> BeanComponentDefinition(fcpBean,</span><br><span class="line">				BeanIds.FILTER_CHAIN_PROXY));</span><br><span class="line">		pc.getRegistry().registerAlias(BeanIds.FILTER_CHAIN_PROXY,</span><br><span class="line">				BeanIds.SPRING_SECURITY_FILTER_CHAIN);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们看到倒数第二行代码，将一个Bean注入到spring中，名字为BeanIds.FILTER_CHAIN_PROXY。</p>
+<p>接着我们看到方法的最后一行代码，给这个Bean赋一个别名BeanIds.SPRING_SECURITY_FILTER_CHAIN，而对应的值就是springSecurityFilterChain</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** External alias for FilterChainProxy bean, for use in web.xml files */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SPRING_SECURITY_FILTER_CHAIN = <span class="string">"springSecurityFilterChain"</span>;</span><br></pre></td></tr></table></figure>
+<p>所以这里也就完成了DelegatingFilterProxy中delegate对象注入到spring容器的过程。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/31/DelegatingFilterProxy/" data-id="cjd1u5hfp0000ggbz32cguiy9" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/01/31/--Java中的引用传递/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Java中的引用传递</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js-css/">js&&css</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/31/DelegatingFilterProxy/">DelegatingFilterProxy</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/--Java中的引用传递/">Java中的引用传递</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/--装饰者模式/">装饰者模式(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/24/--CSS笔记（一）/">CSS笔记（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/24/--JDK1.8中接口的新特性/">JDK1.8中接口的新特性</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
