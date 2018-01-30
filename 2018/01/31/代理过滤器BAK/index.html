@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950 * Proxy for a standard Servlet Filter, delegating to a Spring-manage">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迷途书童的博客">
+<meta property="og:url" content="https://cong96.github.io/2018/01/31/代理过滤器BAK/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950 * Proxy for a standard Servlet Filter, delegating to a Spring-managed bean that * implements the Filter inte">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-30T15:59:51.625Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="迷途书童的博客">
+<meta name="twitter:description" content="1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950 * Proxy for a standard Servlet Filter, delegating to a Spring-managed bean that * implements the Filter inte">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-代理过滤器BAK" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/代理过滤器BAK/" class="article-date">
+  <time datetime="2018-01-30T16:00:55.616Z" itemprop="datePublished">2018-01-31</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"> * Proxy for a standard Servlet Filter, delegating to a Spring-managed bean that</span><br><span class="line"> * implements the Filter interface. Supports a &quot;targetBeanName&quot; filter init-param</span><br><span class="line"> * in &#123;@code web.xml&#125;, specifying the name of the target bean in the Spring</span><br><span class="line"> * application context.</span><br><span class="line">*代理一个标准的Servlet过滤器，委托给一个spring管理的bean。</span><br><span class="line"></span><br><span class="line">*实现过滤器接口。支持“targetBeanName”过滤init-param。</span><br><span class="line"></span><br><span class="line">*在&#123; @code web。xml&#125;，在Spring中指定目标bean的名称。</span><br><span class="line"></span><br><span class="line">*应用程序上下文。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">* &lt; p &gt; &#123; @code网络。xml&#125;通常包含&#123;@code委托filterproxy&#125;定义，</span><br><span class="line"></span><br><span class="line">*与指定的&#123;@code filter-name&#125;对应于一个bean名称。</span><br><span class="line"></span><br><span class="line">* Spring的根应用程序上下文。然后，所有对过滤器代理的调用都将被调用。</span><br><span class="line"></span><br><span class="line">*在Spring上下文中被委托给该bean，这是需要实现的。</span><br><span class="line"></span><br><span class="line">*标准的Servlet过滤器接口。</span><br><span class="line"></span><br><span class="line">*</span><br><span class="line"></span><br><span class="line">*</span><br><span class="line"> * &lt;p&gt;&#123;@code web.xml&#125; will usually contain a &#123;@code DelegatingFilterProxy&#125; definition,</span><br><span class="line"> * with the specified &#123;@code filter-name&#125; corresponding to a bean name in</span><br><span class="line"> * Spring&apos;s root application context. All calls to the filter proxy will then</span><br><span class="line"> * be delegated to that bean in the Spring context, which is required to implement</span><br><span class="line"> * the standard Servlet Filter interface.</span><br><span class="line"> *</span><br><span class="line"> * &lt;p&gt;This approach is particularly useful for Filter implementation with complex</span><br><span class="line"> * setup needs, allowing to apply the full Spring bean definition machinery to</span><br><span class="line"> * Filter instances. Alternatively, consider standard Filter setup in combination</span><br><span class="line"> * with looking up service beans from the Spring root application contex</span><br><span class="line"></span><br><span class="line">这个方法对于复杂的过滤器实现特别有用。</span><br><span class="line"></span><br><span class="line">*设置需要，允许应用完整的Spring bean定义机制。</span><br><span class="line"></span><br><span class="line">*过滤实例。或者，结合使用标准的过滤器设置。</span><br><span class="line"></span><br><span class="line">*从Spring根应用程序上下文中查找服务bean。</span><br></pre></td></tr></table></figure>
+<p>ApplicationFilterChain</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">internalDoFilter</span><span class="params">(ServletRequest request, </span></span></span><br><span class="line"><span class="function"><span class="params">                                 ServletResponse response)</span></span></span><br><span class="line"><span class="function">       <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// Call the next filter if there is one</span></span><br><span class="line">       <span class="keyword">if</span> (pos &lt; n) &#123;</span><br><span class="line">           ApplicationFilterConfig filterConfig = filters[pos++];</span><br><span class="line">           Filter filter = <span class="keyword">null</span>;</span><br><span class="line">           <span class="keyword">try</span> &#123;</span><br><span class="line">               filter = filterConfig.getFilter();</span><br><span class="line">               </span><br><span class="line">               ...</span><br><span class="line">               </span><br><span class="line">               &#125;</span><br></pre></td></tr></table></figure>
+<p>ApplicationFilterConfig getFilter</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Filter <span class="title">getFilter</span><span class="params">()</span> <span class="keyword">throws</span> ClassCastException, ClassNotFoundException,</span></span><br><span class="line"><span class="function">    IllegalAccessException, InstantiationException, ServletException,</span></span><br><span class="line"><span class="function">    InvocationTargetException, NamingException </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Return the existing filter instance, if any</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.filter != <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">this</span>.filter);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Identify the class loader we will be using</span></span><br><span class="line">    String filterClass = filterDef.getFilterClass();</span><br><span class="line">    <span class="keyword">this</span>.filter = (Filter) getInstanceManager().newInstance(filterClass);</span><br><span class="line">    </span><br><span class="line">    initFilter();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">this</span>.filter);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initFilter</span><span class="params">()</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (context <span class="keyword">instanceof</span> StandardContext &amp;&amp;</span><br><span class="line">            context.getSwallowOutput()) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            SystemLogHandler.startCapture();</span><br><span class="line">            filter.init(<span class="keyword">this</span>);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            String capturedlog = SystemLogHandler.stopCapture();</span><br><span class="line">            <span class="keyword">if</span> (capturedlog != <span class="keyword">null</span> &amp;&amp; capturedlog.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                getServletContext().log(capturedlog);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        filter.init(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Expose filter via JMX</span></span><br><span class="line">    registerJMX();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>org.springframework.security.config.BeanIds</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String SPRING_SECURITY_FILTER_CHAIN = <span class="string">"springSecurityFilterChain"</span>;</span><br></pre></td></tr></table></figure>
+<p>所以其实是必须要指定FilterName为springSecurityFilterChain的</p>
+<p>org.springframework.security.config.http.HttpSecurityBeanDefinitionParser</p>
+<p>registerFilterChainProxyIfNecessary(ParserContext, Object)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">registerFilterChainProxyIfNecessary</span><span class="params">(ParserContext pc, Object source)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (pc.getRegistry().containsBeanDefinition(BeanIds.FILTER_CHAIN_PROXY)) &#123;</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// Not already registered, so register the list of filter chains and the</span></span><br><span class="line">		<span class="comment">// FilterChainProxy</span></span><br><span class="line">		BeanDefinition listFactoryBean = <span class="keyword">new</span> RootBeanDefinition(ListFactoryBean.class);</span><br><span class="line">		listFactoryBean.getPropertyValues().add(<span class="string">"sourceList"</span>, <span class="keyword">new</span> ManagedList());</span><br><span class="line">		pc.registerBeanComponent(<span class="keyword">new</span> BeanComponentDefinition(listFactoryBean,</span><br><span class="line">				BeanIds.FILTER_CHAINS));</span><br><span class="line"></span><br><span class="line">		BeanDefinitionBuilder fcpBldr = BeanDefinitionBuilder</span><br><span class="line">				.rootBeanDefinition(FilterChainProxy.class);</span><br><span class="line">		fcpBldr.getRawBeanDefinition().setSource(source);</span><br><span class="line">		fcpBldr.addConstructorArgReference(BeanIds.FILTER_CHAINS);</span><br><span class="line">		fcpBldr.addPropertyValue(<span class="string">"filterChainValidator"</span>, <span class="keyword">new</span> RootBeanDefinition(</span><br><span class="line">				DefaultFilterChainValidator.class));</span><br><span class="line">		BeanDefinition fcpBean = fcpBldr.getBeanDefinition();</span><br><span class="line">		pc.registerBeanComponent(<span class="keyword">new</span> BeanComponentDefinition(fcpBean,</span><br><span class="line">				BeanIds.FILTER_CHAIN_PROXY));</span><br><span class="line">		pc.getRegistry().registerAlias(BeanIds.FILTER_CHAIN_PROXY,</span><br><span class="line">				BeanIds.SPRING_SECURITY_FILTER_CHAIN);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/31/代理过滤器BAK/" data-id="cjd1tzd350005d0bzaaq81dxv" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/31/--Java中的引用传递/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Java中的引用传递
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/31/--装饰者模式/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">装饰者模式(一)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js-css/">js&&css</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/31/--Java中的引用传递/">Java中的引用传递</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/代理过滤器BAK/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/--装饰者模式/">装饰者模式(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/24/--CSS笔记（一）/">CSS笔记（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/24/--JDK1.8中接口的新特性/">JDK1.8中接口的新特性</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

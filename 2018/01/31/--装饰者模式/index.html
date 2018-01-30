@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>装饰者模式(一) | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言最近在复习之前写过的博客，看到Mybatis缓存的部分，想起了Cache的设计用到了装饰者模式，那么刚好我们就来好好看看装饰者模式。 从Mybatis的Cache设计说起我们之前已经说过了，要想让Mybatis的二级缓存生效，需要在Mapper文件中加入如下配置。 1&amp;lt;cache/&amp;gt; 对">
+<meta property="og:type" content="article">
+<meta property="og:title" content="装饰者模式(一)">
+<meta property="og:url" content="https://cong96.github.io/2018/01/31/--装饰者模式/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="前言最近在复习之前写过的博客，看到Mybatis缓存的部分，想起了Cache的设计用到了装饰者模式，那么刚好我们就来好好看看装饰者模式。 从Mybatis的Cache设计说起我们之前已经说过了，要想让Mybatis的二级缓存生效，需要在Mapper文件中加入如下配置。 1&amp;lt;cache/&amp;gt; 对于这个配置的作用，我们直接引用mybatis官方文档。 这个简单语句的效果如下:  映射语句文">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-01-27T16:56:48.428Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="装饰者模式(一)">
+<meta name="twitter:description" content="前言最近在复习之前写过的博客，看到Mybatis缓存的部分，想起了Cache的设计用到了装饰者模式，那么刚好我们就来好好看看装饰者模式。 从Mybatis的Cache设计说起我们之前已经说过了，要想让Mybatis的二级缓存生效，需要在Mapper文件中加入如下配置。 1&amp;lt;cache/&amp;gt; 对于这个配置的作用，我们直接引用mybatis官方文档。 这个简单语句的效果如下:  映射语句文">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post---装饰者模式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/--装饰者模式/" class="article-date">
+  <time datetime="2018-01-30T16:00:55.615Z" itemprop="datePublished">2018-01-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/设计模式/">设计模式</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      装饰者模式(一)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近在复习之前写过的博客，看到Mybatis缓存的部分，想起了Cache的设计用到了装饰者模式，那么刚好我们就来好好看看装饰者模式。</p>
+<h3 id="从Mybatis的Cache设计说起"><a href="#从Mybatis的Cache设计说起" class="headerlink" title="从Mybatis的Cache设计说起"></a>从Mybatis的Cache设计说起</h3><p>我们之前已经说过了，要想让Mybatis的二级缓存生效，需要在Mapper文件中加入如下配置。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">cache</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>对于这个配置的作用，我们直接引用mybatis官方文档。</p>
+<p>这个简单语句的效果如下:</p>
+<ul>
+<li>映射语句文件中的所有 select 语句将会被缓存。</li>
+<li>映射语句文件中的所有 insert,update 和 delete 语句会刷新缓存。</li>
+<li>缓存会使用 Least Recently Used(LRU,最近最少使用的)算法来收回。</li>
+<li>根据时间表(比如 no Flush Interval,没有刷新间隔), 缓存不会以任何时间顺序 来刷新。</li>
+<li>缓存会存储列表集合或对象(无论查询方法返回什么)的 1024 个引用。</li>
+<li>缓存会被视为是 read/write(可读/可写)的缓存,意味着对象检索不是共享的,而 且可以安全地被调用者修改,而不干扰其他调用者或线程所做的潜在修改。</li>
+</ul>
+<p>所有的这些属性都可以通过缓存元素的属性来修改。比如:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">cache</span></span></span><br><span class="line"><span class="tag">  <span class="attr">eviction</span>=<span class="string">"FIFO"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">flushInterval</span>=<span class="string">"60000"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">size</span>=<span class="string">"512"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">readOnly</span>=<span class="string">"true"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这个更高级的配置创建了一个 FIFO 缓存,并每隔 60 秒刷新,存数结果对象或列表的 512 个引用,而且返回的对象被认为是只读的,因此在不同线程中的调用者之间修改它们会 导致冲突。</p>
+<p>可用的收回策略有:</p>
+<ul>
+<li>LRU – 最近最少使用的:移除最长时间不被使用的对象。</li>
+<li>FIFO – 先进先出:按对象进入缓存的顺序来移除它们。</li>
+<li>SOFT – 软引用:移除基于垃圾回收器状态和软引用规则的对象。</li>
+<li>WEAK – 弱引用:更积极地移除基于垃圾收集器状态和弱引用规则的对象。</li>
+</ul>
+<p>默认的是 LRU。</p>
+<p>flushInterval(刷新间隔)可以被设置为任意的正整数,而且它们代表一个合理的毫秒 形式的时间段。默认情况是不设置,也就是没有刷新间隔,缓存仅仅调用语句时刷新。</p>
+<p>size(引用数目)可以被设置为任意正整数,要记住你缓存的对象数目和你运行环境的 可用内存资源数目。默认值是 1024。</p>
+<p>readOnly(只读)属性可以被设置为 true 或 false。只读的缓存会给所有调用者返回缓 存对象的相同实例。因此这些对象不能被修改。这提供了很重要的性能优势。可读写的缓存 会返回缓存对象的拷贝(通过序列化) 。这会慢一些,但是安全,因此默认是 false。</p>
+<h4 id="Mybatis是如何加载Cache配置的"><a href="#Mybatis是如何加载Cache配置的" class="headerlink" title="Mybatis是如何加载Cache配置的"></a>Mybatis是如何加载Cache配置的</h4><p>在Mybatis中，对Mapper配置文件的解析由XMLMapperBuilder来完成。</p>
+<p>configurationElement</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">configurationElement</span><span class="params">(XNode context)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">     String namespace = context.getStringAttribute(<span class="string">"namespace"</span>);</span><br><span class="line">     <span class="keyword">if</span> (namespace.equals(<span class="string">""</span>)) &#123;</span><br><span class="line">   	  <span class="keyword">throw</span> <span class="keyword">new</span> BuilderException(<span class="string">"Mapper's namespace cannot be empty"</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     builderAssistant.setCurrentNamespace(namespace);</span><br><span class="line">     cacheRefElement(context.evalNode(<span class="string">"cache-ref"</span>));</span><br><span class="line">     cacheElement(context.evalNode(<span class="string">"cache"</span>));</span><br><span class="line">     parameterMapElement(context.evalNodes(<span class="string">"/mapper/parameterMap"</span>));</span><br><span class="line">     resultMapElements(context.evalNodes(<span class="string">"/mapper/resultMap"</span>));</span><br><span class="line">     sqlElement(context.evalNodes(<span class="string">"/mapper/sql"</span>));</span><br><span class="line">     buildStatementFromContext(context.evalNodes(<span class="string">"select|insert|update|delete"</span>));</span><br><span class="line">   &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">     <span class="keyword">throw</span> <span class="keyword">new</span> BuilderException(<span class="string">"Error parsing Mapper XML. Cause: "</span> + e, e);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>我们先看使用默认配置情况下的解析</p>
+<pre><code>cacheElement(context.evalNode(&quot;cache&quot;));
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">cacheElement</span><span class="params">(XNode context)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (context != <span class="keyword">null</span>) &#123;</span><br><span class="line">     String type = context.getStringAttribute(<span class="string">"type"</span>, <span class="string">"PERPETUAL"</span>);</span><br><span class="line">     Class&lt;? extends Cache&gt; typeClass = typeAliasRegistry.resolveAlias(type);</span><br><span class="line">     String eviction = context.getStringAttribute(<span class="string">"eviction"</span>, <span class="string">"LRU"</span>);</span><br><span class="line">     Class&lt;? extends Cache&gt; evictionClass = typeAliasRegistry.resolveAlias(eviction);</span><br><span class="line">     Long flushInterval = context.getLongAttribute(<span class="string">"flushInterval"</span>);</span><br><span class="line">     Integer size = context.getIntAttribute(<span class="string">"size"</span>);</span><br><span class="line">     <span class="keyword">boolean</span> readWrite = !context.getBooleanAttribute(<span class="string">"readOnly"</span>, <span class="keyword">false</span>);</span><br><span class="line">     Properties props = context.getChildrenAsProperties();</span><br><span class="line">     builderAssistant.useNewCache(typeClass, evictionClass, flushInterval, size, readWrite, props);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到在cacheElement中，有对cache节点下的属性的值进行读取并作出相应的处理。</p>
+<p>然后通过这些处理过的信息调用 builderAssistant.useNewCache方法来创建Cache实例并注册到Configuration中。</p>
+<p>我们来看MapperBuilderAssistant中的useNewCache方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Cache <span class="title">useNewCache</span><span class="params">(Class&lt;? extends Cache&gt; typeClass,</span></span></span><br><span class="line"><span class="function"><span class="params">    Class&lt;? extends Cache&gt; evictionClass,</span></span></span><br><span class="line"><span class="function"><span class="params">    Long flushInterval,</span></span></span><br><span class="line"><span class="function"><span class="params">    Integer size,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">boolean</span> readWrite,</span></span></span><br><span class="line"><span class="function"><span class="params">    Properties props)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//如果在配置文件中没有显式指定 就使用PerpetualCache.class</span></span><br><span class="line">  typeClass = valueOrDefault(typeClass, PerpetualCache.class);</span><br><span class="line">  <span class="comment">//如果没有显式指定，LruCache.class</span></span><br><span class="line">  evictionClass = valueOrDefault(evictionClass, LruCache.class);</span><br><span class="line">  <span class="comment">//开始创建一个使用了层层装饰者模式包裹的Cache实例</span></span><br><span class="line">  Cache cache = <span class="keyword">new</span> CacheBuilder(currentNamespace)</span><br><span class="line">      .implementation(typeClass)</span><br><span class="line">      .addDecorator(evictionClass)</span><br><span class="line">      .clearInterval(flushInterval)</span><br><span class="line">      .size(size)</span><br><span class="line">      .readWrite(readWrite)</span><br><span class="line">      .properties(props)</span><br><span class="line">      .build();</span><br><span class="line">  <span class="comment">//将cache加入到configuration中</span></span><br><span class="line">  configuration.addCache(cache);</span><br><span class="line">  currentCache = cache;</span><br><span class="line">  <span class="keyword">return</span> cache;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>方法不难理解，就是先创建一个使用了装饰者模式得到的Cache实例，然后将这个实例注入到configuration中。</p>
+<p>所以我们主要看是怎么创建的。</p>
+<p>CacheBuilder</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//默认情况下是PerpetualCache.class，这个一般不会在配置文件中更改</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> CacheBuilder <span class="title">implementation</span><span class="params">(Class&lt;? extends Cache&gt; implementation)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.implementation = implementation;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">//默认的是LruCache 对应的属性是eviction 即设置回收策略</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">LRU – 最近最少使用的:移除最长时间不被使用的对象。</span></span><br><span class="line"><span class="comment">FIFO – 先进先出:按对象进入缓存的顺序来移除它们。</span></span><br><span class="line"><span class="comment">SOFT – 软引用:移除基于垃圾回收器状态和软引用规则的对象。</span></span><br><span class="line"><span class="comment">WEAK – 弱引用:更积极地移除基于垃圾收集器状态和弱引用规则的对象。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> CacheBuilder <span class="title">addDecorator</span><span class="params">(Class&lt;? extends Cache&gt; decorator)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (decorator != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>.decorators.add(decorator);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">//设置缓存失效时间，默认是不设置  ，以毫秒为单位</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> CacheBuilder <span class="title">clearInterval</span><span class="params">(Long clearInterval)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.clearInterval = clearInterval;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">//对应的size属性  默认是1024</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> CacheBuilder <span class="title">size</span><span class="params">(Integer size)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.size = size;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125; </span><br><span class="line"><span class="comment">//对应readOnly属性 设置缓存是否为只读 </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> CacheBuilder <span class="title">readWrite</span><span class="params">(<span class="keyword">boolean</span> readWrite)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.readWrite = readWrite;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">//设置相应的自定义配置，通过属性文件</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> CacheBuilder <span class="title">properties</span><span class="params">(Properties properties)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.properties = properties;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> Cache <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">//使用单个String形参的构造方法来初始化PerpetualCache，构造方法的入参是namesapceName</span></span><br><span class="line">    setDefaultImplementations();</span><br><span class="line"> </span><br><span class="line">    Cache cache = newBaseCacheInstance(implementation, id);</span><br><span class="line">  <span class="comment">//如果有自定义的参数，带上</span></span><br><span class="line">    setCacheProperties(cache);</span><br><span class="line">  <span class="comment">//添加用于设置回收策略的Cache，这里开始了第一次封装Cache</span></span><br><span class="line">    <span class="keyword">if</span> (PerpetualCache.class.equals(cache.getClass())) &#123; <span class="comment">// issue #352, do not apply decorators to custom caches</span></span><br><span class="line">      <span class="keyword">for</span> (Class&lt;? extends Cache&gt; decorator : decorators) &#123;</span><br><span class="line">        cache = newCacheDecoratorInstance(decorator, cache);</span><br><span class="line">        setCacheProperties(cache);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//这里实现了cache装饰类的层层封装</span></span><br><span class="line">      cache = setStandardDecorators(cache);</span><br><span class="line">    &#125; </span><br><span class="line">  <span class="comment">//最后还是封装成一个LoggingCache类型的Cache，这个Cache已经经过层层装饰了</span></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (!LoggingCache.class.isAssignableFrom(cache.getClass())) &#123;</span><br><span class="line">      cache = <span class="keyword">new</span> LoggingCache(cache);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cache;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>来稍微看一下具体的装饰步骤</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Cache <span class="title">newCacheDecoratorInstance</span><span class="params">(Class&lt;? extends Cache&gt; cacheClass, Cache base)</span> </span>&#123;</span><br><span class="line">  Constructor&lt;? extends Cache&gt; cacheConstructor = getCacheDecoratorConstructor(cacheClass);</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> cacheConstructor.newInstance(base);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> CacheException(<span class="string">"Could not instantiate cache decorator ("</span> + cacheClass + <span class="string">"). Cause: "</span> + e, e);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Cache <span class="title">setStandardDecorators</span><span class="params">(Cache cache)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      MetaObject metaCache = SystemMetaObject.forObject(cache);</span><br><span class="line">      <span class="keyword">if</span> (size != <span class="keyword">null</span> &amp;&amp; metaCache.hasSetter(<span class="string">"size"</span>)) &#123;</span><br><span class="line">        metaCache.setValue(<span class="string">"size"</span>, size);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//如果设置了缓存失效时间,加一个ScheduledCache装饰类</span></span><br><span class="line">      <span class="keyword">if</span> (clearInterval != <span class="keyword">null</span>) &#123;</span><br><span class="line">        cache = <span class="keyword">new</span> ScheduledCache(cache);</span><br><span class="line">        ((ScheduledCache) cache).setClearInterval(clearInterval);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//如果并不是只读，加一个SerializedCache装饰类</span></span><br><span class="line">      <span class="keyword">if</span> (readWrite) &#123;</span><br><span class="line">        cache = <span class="keyword">new</span> SerializedCache(cache);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//然后加上具有日志功能的装饰类</span></span><br><span class="line">      cache = <span class="keyword">new</span> LoggingCache(cache);</span><br><span class="line">      <span class="comment">//然后加上具有同步功能的装饰类</span></span><br><span class="line">      cache = <span class="keyword">new</span> SynchronizedCache(cache);</span><br><span class="line">      <span class="keyword">return</span> cache;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> CacheException(<span class="string">"Error building standard cache decorators.  Cause: "</span> + e, e);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>通过这个分析，我们可以得到基本的Cache的装饰链</p>
+<p>LoggingCache-&gt; SynchronizedCache-&gt;SerializedCache-&gt;LoggingCache-&gt;ScheduledCache-&gt;LRUCache-&gt;PerpetualCache。</p>
+<p>也就是说其实最后最终调用的还是PerpetualCache里的方法。</p>
+<p>最后说一下：加入到configuration的过程。    configuration.addCache(cache);</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCache</span><span class="params">(Cache cache)</span> </span>&#123;</span><br><span class="line">  caches.put(cache.getId(), cache);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>cache.getId()，id是在初始化PerpetualCache这个Cache的时候通过构造方法传入的，id的值是这个Mapper的命名空间名。所以这样我们才能在MappedStatement中找对应的cache.</p>
+<p>我们再回头看看我们曾经说过的Mybatis二级缓存。</p>
+<p>我们直接看CacheExecutor的query方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  <span class="comment">//获取该Mapper命名空间下的缓存</span></span><br><span class="line">  Cache cache = ms.getCache();</span><br><span class="line">  <span class="comment">//如果有，开始准备使用缓存了</span></span><br><span class="line">  <span class="keyword">if</span> (cache != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">//如果是select语句，默认情况下不清缓存，但是如果在Mapper文件中有在select配置中配置属性fluchCache为true的话，会执行缓存清理的动作。具体对这个是否需要请缓存配置的解析在XMLStatementBuilder类的parseStatementNode方法中。</span></span><br><span class="line">    flushCacheIfRequired(ms);</span><br><span class="line">    <span class="comment">//如果确定这个select语句使用了Cache并且方法参数中没有resultHandler类型的参数。就使用Cache了</span></span><br><span class="line">    <span class="keyword">if</span> (ms.isUseCache() &amp;&amp; resultHandler == <span class="keyword">null</span>) &#123;</span><br><span class="line">      ensureNoOutParams(ms, parameterObject, boundSql);</span><br><span class="line">      <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">      <span class="comment">//从缓存中找</span></span><br><span class="line">      List&lt;E&gt; list = (List&lt;E&gt;) tcm.getObject(cache, key);</span><br><span class="line">      <span class="comment">//如果没找到，去查询</span></span><br><span class="line">      <span class="keyword">if</span> (list == <span class="keyword">null</span>) &#123;</span><br><span class="line">        list = delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">        <span class="comment">//将查询的结果放入Cache中</span></span><br><span class="line">        tcm.putObject(cache, key, list); <span class="comment">// issue #578. Query must be not synchronized to prevent deadlocks</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">//返回结果</span></span><br><span class="line">      <span class="keyword">return</span> list;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>方法的大概流程已经在代码块中解释了。</p>
+<p>我们主要看下这个过程中对缓存的使用。</p>
+<p>先看是否执行缓存清理的方法</p>
+<p><strong>flushCacheIfRequired</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">flushCacheIfRequired</span><span class="params">(MappedStatement ms)</span> </span>&#123;</span><br><span class="line">   Cache cache = ms.getCache();</span><br><span class="line">  <span class="comment">//如果需要清理缓存，update的时候默认清理缓存</span></span><br><span class="line">   <span class="keyword">if</span> (cache != <span class="keyword">null</span> &amp;&amp; ms.isFlushCacheRequired()) &#123;      </span><br><span class="line">     tcm.clear(cache);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">(Cache cache)</span> </span>&#123;</span><br><span class="line">   getTransactionalCache(cache).clear();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> TransactionalCache <span class="title">getTransactionalCache</span><span class="params">(Cache cache)</span> </span>&#123;</span><br><span class="line">   TransactionalCache txCache = transactionalCaches.get(cache);</span><br><span class="line">   <span class="keyword">if</span> (txCache == <span class="keyword">null</span>) &#123;</span><br><span class="line">     txCache = <span class="keyword">new</span> TransactionalCache(cache);</span><br><span class="line">     transactionalCaches.put(cache, txCache);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> txCache;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>tcm对应的是一个TransactionalCacheManager对象，可以把他看做一个TransactionalCache池。在CachingExecutor中是这样初始化的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> TransactionalCacheManager tcm = <span class="keyword">new</span> TransactionalCacheManager();</span><br></pre></td></tr></table></figure>
+<p>所以在初始化Executor执行器的时候，tcm也就存在了。</p>
+<p>TransactionalCacheManager中的getTransactionalCache方法，这个方法很明显是构造一下cache和TransactionalCache的关系，存入Map中，而且TransactionalCache将cache作为构造方法的入参。</p>
+<p>所以这里，每一个cache就对应着一个包含cache的TransactionalCache对象。</p>
+<p>TransactionalCache的clear方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  reset();</span><br><span class="line">  clearOnCommit = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  clearOnCommit = <span class="keyword">false</span>;</span><br><span class="line">  entriesToRemoveOnCommit.clear();</span><br><span class="line">  entriesToAddOnCommit.clear();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>clear方法最后把clearOnCommit置为true.</p>
+<p>并且把entriesToRemoveOnCommit和entriesToAddOnCommit这两个Map中的元素都清空了、。</p>
+<p><strong>tcm.putObject(cache, key, list);</strong></p>
+<p>将结果放入到缓存的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putObject</span><span class="params">(Cache cache, CacheKey key, Object value)</span> </span>&#123;</span><br><span class="line">  getTransactionalCache(cache).putObject(key, value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用的是TransactionalCache的putObject方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putObject</span><span class="params">(Object key, Object object)</span> </span>&#123;</span><br><span class="line"><span class="comment">//移除entriesToRemoveOnCommit中key为当前的CacheKey的元素</span></span><br><span class="line">   entriesToRemoveOnCommit.remove(key);</span><br><span class="line">   <span class="comment">//将当前的CacheKey为keey，并且构造一个包含cache，CacheKey和查询结果的AddEntry为Value存进entriesToAddCommit</span></span><br><span class="line">   entriesToAddOnCommit.put(key, <span class="keyword">new</span> AddEntry(delegate, key, object));</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>所以到这里呢，putObject方法呢，实际上只是把元素存在位于TranscationCache中的entriesToRemoveOnCommit这个Map中。</p>
+<p><strong>注意，此时并没有将查询结果放入到我们之前说的装饰器模式构造的cache中。</strong></p>
+<p><strong>tcm.getObject(cache, key);</strong></p>
+<p>在缓存中查找是否有当前CacheKey对应的值。</p>
+<p>调用的是ransactionalCache的getObject方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> Object <span class="title">getObject</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (clearOnCommit) <span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// issue #146</span></span><br><span class="line">   <span class="keyword">return</span> delegate.getObject(key);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>当clearOnCommit为true的时候就直接返回了，即代表着如果是udpate语句或者设置了flushCache属性为true的话，就甭想着在cache里面找，赶紧再跟数据库做交互呀。</p>
+<p>如果不为true，那么就要在cache中去寻找当前CacheKey对应的值了。</p>
+<p>而你会发现，之前的putObject并没有把值存入到cache中呀，所以这里根本不用分析了，肯定是找不到的。是的，不信你做个试验，你会发现第二次查询的时候依然是直接跟数据库做交互，不会在缓存中取。</p>
+<p><strong>事实上，如果你想要让Mybatis的二级缓存失效，你需要手动的在查询后执行session.commit操作。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    commit(<span class="keyword">false</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commit</span><span class="params">(<span class="keyword">boolean</span> force)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      executor.commit(isCommitOrRollbackRequired(force));</span><br><span class="line">      dirty = <span class="keyword">false</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">"Error committing transaction.  Cause: "</span> + e, e);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      ErrorContext.instance().reset();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">当调用无参的commit方法时，force指定是false</span></span><br><span class="line"><span class="comment">使用DefaultSqlSessionFactory的无参openSession()方法时，autoCommit为false</span></span><br><span class="line"><span class="comment">如果使用的是有参的openSession(boolean autoCommit)方法，那就取决于传入的参数了</span></span><br><span class="line"><span class="comment">所以也就是说，如果没有显式的将dirty设置为true的时候方法返回false</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">***注意  在调用update方法的时候，会把dirty设置为true，这时候方法就会返回true了。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isCommitOrRollbackRequired</span><span class="params">(<span class="keyword">boolean</span> force)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (!autoCommit &amp;&amp; dirty) || force;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，其实session.commit()实际上调用的是executor的commit方法。而具体传什么参数给executor的commit方法是由isCommitOrRollbackRequired方法决定的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commit</span><span class="params">(<span class="keyword">boolean</span> required)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    delegate.commit(required);</span><br><span class="line">    tcm.commit();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//BaseExecutor</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commit</span><span class="params">(<span class="keyword">boolean</span> required)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (closed) <span class="keyword">throw</span> <span class="keyword">new</span> ExecutorException(<span class="string">"Cannot commit, transaction is already closed"</span>);</span><br><span class="line">  <span class="comment">//清理一级缓存</span></span><br><span class="line">    clearLocalCache();</span><br><span class="line">  <span class="comment">//BatchExecutor有重写这个方法里的具体方法，目前没有用到，先不分析</span></span><br><span class="line">    flushStatements();</span><br><span class="line">  <span class="comment">//这里就执行      connection.commit();操作 非查询数据的时候会用到</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (required) &#123;</span><br><span class="line">      transaction.commit();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>我们这里不去过多的分析executor的commit()方法。</p>
+<p>而是要分析</p>
+<p><strong>tcm.commit();</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">for</span> (TransactionalCache txCache : transactionalCaches.values()) &#123;</span><br><span class="line">     txCache.commit();</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>调用这个会话中的TransactionalCache池里的所有TransactionalCache的commit()方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">//如果clearOnCommit为true，那么就清理掉所有的放在cache里的数据</span></span><br><span class="line">  <span class="keyword">if</span> (clearOnCommit) &#123;</span><br><span class="line">    delegate.clear();</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//将要从cache中要移除的元素移除了</span></span><br><span class="line">    <span class="keyword">for</span> (RemoveEntry entry : entriesToRemoveOnCommit.values()) &#123;</span><br><span class="line">      entry.commit();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//将要添加到cache中的元素添加到cache中</span></span><br><span class="line">  <span class="keyword">for</span> (AddEntry entry : entriesToAddOnCommit.values()) &#123;</span><br><span class="line">    entry.commit();</span><br><span class="line">  &#125;</span><br><span class="line">  reset();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AddEntry是TransactionalCache的一个静态内部类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AddEntry</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> Cache cache;</span><br><span class="line">  <span class="keyword">private</span> Object key;</span><br><span class="line">  <span class="keyword">private</span> Object value;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">AddEntry</span><span class="params">(Cache cache, Object key, Object value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.cache = cache;</span><br><span class="line">    <span class="keyword">this</span>.key = key;</span><br><span class="line">    <span class="keyword">this</span>.value = value;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">commit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cache.putObject(key, value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>很明显他的commit方法就是在调用cache的putObject方法。</p>
+<p>那么这个putObject方法就是我们要看的。</p>
+<p>LoggingCache</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putObject</span><span class="params">(Object key, Object object)</span> </span>&#123;</span><br><span class="line">   delegate.putObject(key, object);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>我们一开始说了，我们得到的cache是一个LoggingCache实例。他的delegate属性是SynchronizedCache,他保证放入数据时候的线程安全。而如果没有设置readOnly为true的时候，会接着调用SerializedCache来做一个序列化的操作。如果设置了缓存过时时间，会调用ScheduledCache来做一个查看是否缓存失效的判断。接着就到了设置回收策略的Cache，我们这里默认是LRUCache，即最近最少使用，内部是使用LinkedHashMap实现的，并不复杂，回收策略是必须的，因为缓存不可能无限大，一定要设置一个max值。然后才到PerpetualCache，这才到了我们把CacheKey和查询结果存放起来的类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">private</span> Map&lt;Object, Object&gt; cache = <span class="keyword">new</span> HashMap&lt;Object, Object&gt;();</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">putObject</span><span class="params">(Object key, Object value)</span> </span>&#123;</span><br><span class="line">   cache.put(key, value);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>很简单，就是把键值对放到cache这个Map中。</p>
+<p>而对于delegate.getObject(key);的具体过程，当然是和delegate.putObject(key, object);相似的，就不细说了。</p>
+<p>这里我们看到了每一个Cache都有自己的功能，而PerpetualCache只有最原始的存放数据和得到数据的功能。为了让Cache的功能更强大，我们使用了装饰者模式来一步步的丰富Cache的功能。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/01/31/--装饰者模式/" data-id="cjd1tzd2h0001d0bzx76nysvv" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/31/代理过滤器BAK/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/24/--CSS笔记（一）/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">CSS笔记（一）</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js-css/">js&&css</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/31/--Java中的引用传递/">Java中的引用传递</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/代理过滤器BAK/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/--装饰者模式/">装饰者模式(一)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/24/--CSS笔记（一）/">CSS笔记（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/24/--JDK1.8中接口的新特性/">JDK1.8中接口的新特性</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
