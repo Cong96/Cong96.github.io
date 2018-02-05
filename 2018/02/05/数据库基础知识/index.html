@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>数据库基础知识 | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="资料B树，B+树http://blog.csdn.net/endlu/article/details/51720299 索引：https://www.cnblogs.com/aspwebchh/p/6652855.html 主从表 主表 在数据库中建立的表格即Table，其中存在主键(primary key)用于与其它">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库基础知识">
+<meta property="og:url" content="https://cong96.github.io/2018/02/05/数据库基础知识/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="资料B树，B+树http://blog.csdn.net/endlu/article/details/51720299 索引：https://www.cnblogs.com/aspwebchh/p/6652855.html 主从表 主表 在数据库中建立的表格即Table，其中存在主键(primary key)用于与其它表相关联，并且作为在主表中的唯一性标识。  从表 以主表的主键（primary">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-02-05T14:07:06.455Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据库基础知识">
+<meta name="twitter:description" content="资料B树，B+树http://blog.csdn.net/endlu/article/details/51720299 索引：https://www.cnblogs.com/aspwebchh/p/6652855.html 主从表 主表 在数据库中建立的表格即Table，其中存在主键(primary key)用于与其它表相关联，并且作为在主表中的唯一性标识。  从表 以主表的主键（primary">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-数据库基础知识" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/02/05/数据库基础知识/" class="article-date">
+  <time datetime="2018-02-05T14:22:29.689Z" itemprop="datePublished">2018-02-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/数据库/">数据库</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      数据库基础知识
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h3><p>B树，B+树<a href="http://blog.csdn.net/endlu/article/details/51720299" target="_blank" rel="noopener">http://blog.csdn.net/endlu/article/details/51720299</a></p>
+<p>索引：<a href="https://www.cnblogs.com/aspwebchh/p/6652855.html" target="_blank" rel="noopener">https://www.cnblogs.com/aspwebchh/p/6652855.html</a></p>
+<h3 id="主从表"><a href="#主从表" class="headerlink" title="主从表"></a>主从表</h3><ul>
+<li><p><strong>主表</strong></p>
+<p>在数据库中建立的表格即Table，其中存在主键(primary key)用于与其它表相关联，并且作为在主表中的唯一性标识。</p>
+</li>
+<li><p><strong>从表</strong></p>
+<p>以主表的主键（primary key）值为外键 (Foreign Key)的表，可以通过外键与主表进行关联查询。从表与主表通过外键进行关联查询。</p>
+<p>A表中的一个字段，是B表的主键，那他就可以是A表的外键。</p>
+</li>
+</ul>
+<p>从表数据依赖于主表，一般最后查询数据时把主表与从表进行关联查询。主表可用于存储主要信息，如客户资料（客户编号，客户名称，客户公司，客户单位等），从表用来存储客户扩展信息（客户订单信息，客户地址信息，客户联系方式信息等）</p>
+<h3 id="JOIN"><a href="#JOIN" class="headerlink" title="JOIN"></a>JOIN</h3><ul>
+<li><p><strong>left join（左连接）</strong></p>
+<p>默认加上了outer ，即全名为left outer join</p>
+<p>select * from A<br>left join B<br>on A.aID = B.bID</p>
+<p>left join是以A表的记录为基础的,A可以看成左表,B可以看成右表,left join是以左表为准的.<br>换句话说,左表(A)的记录将会全部表示出来,而右表(B)只会显示符合搜索条件的记录(例子中为: A.aID = B.bID).<br>B表记录不足的地方均为NULL.</p>
+</li>
+<li><p><strong>right join(右连接)</strong></p>
+<p>select * from A<br>right join B<br>on A.aID = B.bID</p>
+<p>以右表(B)为基础的,A表不足的地方用NULL填充.</p>
+</li>
+<li><p><strong>inner join(等值连接)</strong></p>
+<p>select * from A<br>innerjoin B<br>on A.aID = B.bID</p>
+</li>
+</ul>
+<p>只显示出了 A.aID = B.bID的记录.这说明inner join并不以谁为基础,它只显示符合条件的记录.</p>
+<h4 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h4><p><strong>outer join一旦加上where条件会变成inner join</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.*,b.*</span><br><span class="line"><span class="keyword">from</span> table1 a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> table2 b <span class="keyword">on</span> b.X=a.X</span><br><span class="line"><span class="keyword">where</span> XXX</span><br></pre></td></tr></table></figure>
+<p>数据库在通过连接两张或多张表来返回记录时，都会生成一张中间的临时表，然后再将这张临时表返回给用户；</p>
+<p><strong>where条件是在临时表生成好后，再对临时表进行过滤的条件；</strong></p>
+<p>因此：where 条件加上，已经没有left join的含义（必须返回左边表的记录）了，条件不为真的就全部过滤掉。 </p>
+<p>需要做如下更改：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.*,tmp.*</span><br><span class="line"><span class="keyword">from</span> table1 a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span>(</span><br><span class="line">    <span class="keyword">select</span> a.*,b.*</span><br><span class="line">    <span class="keyword">from</span> table1 a</span><br><span class="line">    <span class="keyword">left</span> <span class="keyword">join</span> table2 b <span class="keyword">on</span> b.X=a.X</span><br><span class="line">    <span class="keyword">where</span> XXX</span><br><span class="line">)tmp</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.*,b.*</span><br><span class="line"><span class="keyword">from</span> table1 a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> table2 b <span class="keyword">on</span> b.X=a.X <span class="keyword">and</span> XX</span><br></pre></td></tr></table></figure>
+<p>注意：where XXX去掉，改为链接条件on后面的 and XXX</p>
+<p><strong>on条件是在生成临时表时使用的条件，它不管on中的条件是否为真，都会返回左边表的记录</strong></p>
+<h3 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h3><ul>
+<li><p><strong>平衡树</strong></p>
+<ul>
+<li><p><strong>B Tree</strong></p>
+<p>B 树是为了磁盘或其它存储设备而设计的一种多叉平衡查找树。</p>
+<p>B 树又叫平衡多路查找树。一棵m阶的B 树 (m叉树)的特性如下：</p>
+<ol>
+<li>树中每个结点最多含有m个孩子（m&gt;=2）；</li>
+<li>除根结点和叶子结点外，其它每个结点至少有[ceil(m / 2)]个孩子（其中ceil(x)是一个取上限的函数）；</li>
+<li>若根结点不是叶子结点，则至少有2个孩子（特殊情况：没有孩子的根结点，即根结点为叶子结点，整棵树只有一个根节点）；</li>
+<li>所有叶子结点都出现在同一层，叶子结点不包含任何关键字信息(可以看做是外部接点或查询失败的接点，实际上这些结点不存在，指向这些结点的指针都为null)；</li>
+<li>每个非终端结点中包含有n个关键字信息： (P1，K1，P2，K2，P3，……，Kn，Pn+1)。其中：<br>​       a)   Ki (i=1…n)为关键字，且关键字按顺序升序排序K(i-1)&lt; Ki。<br>​       b)   Pi为指向子树根的接点，且指针P(i)指向子树种所有结点的关键字均小于Ki，但都大于K(i-1)。<br>​       c)   关键字的个数n必须满足： [ceil(m / 2)-1]&lt;= n &lt;= m-1。</li>
+</ol>
+<p>索引为什么选用B树这种数据结构？<br>因为使用B树查找时，所用的磁盘IO操作次数比平衡二叉树更少，效率也更高。<br>为什么使用B树查找所用的磁盘IO操作次数比平衡二叉树更少？<br>大规模数据存储中，树节点存储的元素数量是有限的（如果元素数量非常多的话，查找就退化成节点内部的线性查找了），这样导致二叉查找树结构由于树的高度过大而造成磁盘I/O读写过于频繁，进而导致查询效率低下。那么我们就需要减少树的高度以提高查找效率。而平衡多路查找树结构B树就满足这样的要求。B树的各种操作能使B树保持较低的高度，从而达到有效减少磁盘IO操作次数。</p>
+</li>
+<li><p><strong>B+ Tree</strong></p>
+<p>B+Tree是应文件系统所需而出的一种B-Tree的变型树，一棵m阶的B+树和m阶的B-树的差异在于:<br>1.有n棵子树的结点中含有n个关键字；<br>2.所有的叶子结点中包含了全部关键字的信息，及指向含这些关键字的记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接；<br>3.所有的非终端结点可以看成是索引部分，结点中仅含有其子树(根结点)中的最大（或最小）关键字；</p>
+</li>
+<li><p><strong>区别</strong></p>
+<p>1) B+-tree的磁盘读写代价更低</p>
+<p>B+-tree的内部结点并没有指向关键字具体信息的指针。因此其内部结点相对B 树更小。如果把所有同一内部结点的关键字存放在同一盘块中，那么盘块所能容纳的关键字数量也越多。一次性读入内存中的需要查找的关键字也就越多。相对来说IO读写次数也就降低了。</p>
+<p>   举个例子，假设磁盘中的一个盘块容纳16bytes，而一个关键字2bytes，一个关键字具体信息指针2bytes。一棵9阶B-tree(一个结点最多8个关键字)的内部结点需要2个盘快。而B+ 树内部结点只需要1个盘快。当需要把内部结点读入内存中的时候，B 树就比B+ 树多一次盘块查找时间(在磁盘中就是盘片旋转的时间)。</p>
+<p>2) B+-tree的查询效率更加稳定</p>
+<p>由于非终结点并不是最终指向文件内容的结点，而只是叶子结点中关键字的索引。所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>聚集索引</strong></p>
+<p>聚集索引也称为聚簇索引（Clustered Index），聚类索引，簇集索引。</p>
+<p>聚集索引是指数据库表行中数据的物理顺序与键值的逻辑（索引）顺序相同。一个表只能有一个聚集索引，因为一个表的物理顺序只有一种情况，所以，对应的聚集索引只能有一个。如果某索引不是聚集索引，则表中的行物理顺序与索引顺序不匹配，与非聚集索引相比，聚集索引有着更快的检索速度。</p>
+<p>聚集索引确定表中数据的物理顺序。聚集索引类似于电话簿，按姓氏排列数据。由于聚集索引规定数据在表中的物理存储顺序，因此一个表只能包含一个聚集索引。但该索引可以包含多个列（组合索引），就像电话簿按姓氏和名字进行组织一样。</p>
+<p>聚集索引对于那些经常要搜索范围值的列特别有效。使用聚集索引找到包含第一个值的行后，便可以确保包含后续索引值的行在物理相邻。例如，如果应用程序执行的一个查询经常检索某一日期范围内的记录，则使用聚集索引可以迅速找到包含开始日期的行，然后检索表中所有相邻的行，直到到达结束日期。这样有助于提高此类查询的性能。同样，如果对从表中检索的数据进行排序时经常要用到某一列，则可以将该表在该列上聚集（物理排序），避免每次查询该列时都进行排序，从而节省成本。</p>
+<p>当索引值唯一时，使用聚集索引查找特定的行也很有效率。例如，使用唯一雇员 ID 列 emp_id 查找特定雇员的最快速的方法，是在 emp_id 列上创建聚集索引或 PRIMARY KEY 约束。</p>
+<p>1、含有大量非重复值的列。</p>
+<p>2、使用BETWEEN,&gt;,&gt;=,&lt;或&lt;=返回一个范围值的列</p>
+<p>3、被连续访问的列</p>
+<p>4、返回大型结果集的查询</p>
+<p>5、经常被使用连接或GROUP BY子句的查询访问的列</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>动作描述</th>
+<th>使用聚集索引</th>
+<th>使用非聚集索引</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>列经常被分组排序</td>
+<td>应</td>
+<td>应</td>
+</tr>
+<tr>
+<td>返回某范围内的数据</td>
+<td>应</td>
+<td>不应</td>
+</tr>
+<tr>
+<td>一个或极少不同值</td>
+<td>不应</td>
+<td>不应</td>
+</tr>
+<tr>
+<td>小数目的不同值</td>
+<td>应</td>
+<td>不应</td>
+</tr>
+<tr>
+<td>大数目的不同值</td>
+<td>不应</td>
+<td>应</td>
+</tr>
+<tr>
+<td>频繁更新的列</td>
+<td>不应</td>
+<td>应</td>
+</tr>
+<tr>
+<td>外键列</td>
+<td>应</td>
+<td>应</td>
+</tr>
+<tr>
+<td>主键列</td>
+<td>应</td>
+<td>应</td>
+</tr>
+<tr>
+<td>频繁修改索引列</td>
+<td>不应</td>
+<td>应</td>
+</tr>
+</tbody>
+</table>
+<h3 id="主键"><a href="#主键" class="headerlink" title="主键"></a>主键</h3><p>我们平时建表的时候都会为表加上主键， 在某些关系数据库中， 如果建表时不指定主键，数据库会拒绝建表的语句执行。 事实上， 一个加了主键的表，并不能被称之为「表」。一个没加主键的表，它的数据无序的放置在磁盘存储器上，一行一行的排列的很整齐， 跟我认知中的「表」很接近。如果给表上了主键，那么表在磁盘上的存储结构就由整齐排列的结构转变成了树状结构，也就是上面说的「平衡树」结构，换句话说，就是整个表就变成了一个索引。整个表变成了一个索引，也就是所谓的「聚集索引」。 这就是为什么一个表只能有一个主键， 一个表只能有一个「聚集索引」，因为主键的作用就是把「表」的数据格式转换成「索引（平衡树）」的格式放置。</p>
+<h3 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h3><p>当并发事务同时访问一个资源时，有可能导致数据不一致，因此需要一种机制来将数据访问顺序化，以保证数据库数据的一致性。锁就是其中的一种机制。</p>
+<p>在计算机科学中，锁是在执行多线程时用于强行限制资源访问的同步机制，即用于在并发控制中保证对互斥要求的满足。</p>
+<ul>
+<li><p><strong>锁的分类(oracle)</strong></p>
+<p>​</p>
+</li>
+</ul>
+<p>一、按操作划分，可分为<code>DML锁</code>、<code>DDL锁</code></p>
+<p>二、按锁的粒度划分，可分为表级锁, 页级锁, 行级锁（mysql）</p>
+<p>三、按锁级别划分，可分为共享锁、排它锁</p>
+<p>四、按加锁方式划分，可分为<code>自动锁</code>、<code>显示锁</code></p>
+<p>五、按使用方式划分，可分为乐观锁, 悲观锁<a href="http://www.hollischuang.com/archives/934" target="_blank" rel="noopener">``</a></p>
+<p>DML锁（data locks，数据锁），用于保护数据的完整性，其中包括行级锁(Row Locks (TX锁))、表级锁(table lock(TM锁))。 DDL锁（dictionary locks，数据字典锁），用于保护数据库对象的结构，如表、索引等的结构定义。其中包排他DDL锁（Exclusive DDL lock）、共享DDL锁（Share DDL lock）、可中断解析锁（Breakable parse locks）</p>
+<h3 id="MySql"><a href="#MySql" class="headerlink" title="MySql"></a>MySql</h3><p>MyISAM是<a href="http://lib.csdn.net/base/mysql" target="_blank" rel="noopener">MySQL</a> 5.5之前版本默认的存储引擎，从5.5之后，InnoDB开始成为MySQL默认的存储引擎。</p>
+<p>MyISAM使用B-Tree实现主键索引、唯一索引和非主键索引。</p>
+<p>InnoDB中非主键索引使用的是B-Tree数据结构，而主键索引使用的是B+Tree。</p>
+<p>在DBMS中，可以按照锁的粒度把数据库锁分为行级锁(INNODB引擎)、表级锁(MYISAM引擎)和页级锁(BDB引擎 )。</p>
+<ul>
+<li><p><strong>MySQL中的行级锁，表级锁，页级锁</strong></p>
+<ul>
+<li><p><strong>行级锁</strong></p>
+<p>行级锁是MySQL中锁粒度最细的一种锁，表示只针对当前操作的行进行加锁。行级锁能大大减少数据库操作的冲突。其加锁粒度最小，但加锁的开销也最大。行级锁分为共享锁和排他锁。</p>
+<h4 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h4><p>开销大，加锁慢；会出现死锁；锁定粒度最小，发生锁冲突的概率最低，并发度也最高。</p>
+</li>
+<li><p><strong>表级锁</strong></p>
+<p>表级锁是MySQL中锁定粒度最大的一种锁，表示对当前操作的整张表加锁，它实现简单，资源消耗较少，被大部分MySQL引擎支持。最常使用的MYISAM与INNODB都支持表级锁定。表级锁定分为<code>表共享读锁</code>（共享锁）与<code>表独占写锁</code>（排他锁）</p>
+<p>####特点</p>
+<p>开销小，加锁快；不会出现死锁；锁定粒度大，发出锁冲突的概率最高，并发度最低。</p>
+</li>
+<li><p><strong>页级锁</strong></p>
+<p>页级锁是MySQL中锁定粒度介于行级锁和表级锁中间的一种锁。表级锁速度快，但冲突多，行级冲突少，但速度慢。所以取了折衷的页级，一次锁定相邻的一组记录。BDB支持页级锁</p>
+<p>####特点</p>
+<p>开销和加锁时间界于表锁和行锁之间；会出现死锁；锁定粒度界于表锁和行锁之间，并发度一般</p>
+</li>
+</ul>
+</li>
+<li><p><strong>MySQL中常用存储引擎的锁机制</strong></p>
+<p>MyISAM和MEMORY采用表级锁(table-level locking)</p>
+<p>BDB采用页面锁(page-level locking)或表级锁，默认为页面锁</p>
+<p>InnoDB支持行级锁(row-level locking)和表级锁,默认为行级锁</p>
+</li>
+<li><p><strong>InnoDB中的行锁和表锁</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction</span><br></pre></td></tr></table></figure>
+<p>​</p>
+<p>前面提到过，在Innodb引擎中既支持行锁也支持表锁，那么什么时候会锁住整张表，什么时候或只锁住一行呢？</p>
+<p>InnoDB行锁是通过给索引上的索引项加锁来实现的，这一点MySQL与Oracle不同，后者是通过在数据块中对相应数据行加锁来实现的。InnoDB这种行锁实现特点意味着：<strong>只有通过索引条件检索数据，InnoDB才使用行级锁，否则，InnoDB将使用表锁！</strong></p>
+<p>在实际应用中，要特别注意InnoDB行锁的这一特性，不然的话，可能导致大量的锁冲突，从而影响并发性能。</p>
+<p><strong>行级锁都是基于索引的，如果一条SQL语句用不到索引是不会使用行级锁的，会使用表级锁。行级锁的缺点是：由于需要请求大量的锁资源，所以速度慢，内存消耗大。</strong></p>
+</li>
+<li><p><strong>行级锁与死锁</strong></p>
+<p>MyISAM中是不会产生死锁的，因为MyISAM总是一次性获得所需的全部锁，要么全部满足，要么全部等待。而在InnoDB中，锁是逐步获得的，就造成了死锁的可能。</p>
+<p>在MySQL中，行级锁并不是直接锁记录，而是锁索引。索引分为主键索引和非主键索引两种，如果一条sql语句操作了主键索引，MySQL就会锁定这条主键索引；如果一条语句操作了非主键索引，MySQL会先锁定该非主键索引，再锁定相关的主键索引。 在UPDATE、DELETE操作时，MySQL不仅锁定WHERE条件扫描过的所有索引记录，而且会锁定相邻的键值，即所谓的next-key locking(防止幻读)。</p>
+<p><strong>当两个事务同时执行，一个锁住了主键索引，在等待其他相关索引。另一个锁定了非主键索引，在等待主键索引。这样就会发生死锁。</strong></p>
+<p>发生死锁后，InnoDB一般都可以检测到，并使一个事务释放锁回退，另一个获取锁完成事务。</p>
+<p>有多种方法可以避免死锁，这里只介绍常见的三种</p>
+<p>1、如果不同程序会并发存取多个表，尽量约定以相同的顺序访问表，可以大大降低死锁机会。</p>
+<p>2、在同一个事务中，尽可能做到一次锁定所需要的所有资源，减少死锁产生概率；</p>
+<p>3、对于非常容易产生死锁的业务部分，可以尝试使用升级锁定颗粒度，通过表级锁定来减少死锁产生的概率；</p>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/02/05/数据库基础知识/" data-id="cjdab4v4i000blkbzd15zw2pl" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/02/05/CAS/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          CAS
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/02/05/CAS结合openldap/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">CAS结合openldap</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CAS/">CAS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js-css/">js&&css</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/02/05/CAS简单实例/">CAS简单实例</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/CAS/">CAS</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/数据库基础知识/">数据库基础知识</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/CAS结合openldap/">CAS结合openldap</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/DelegatingFilterProxy/">DelegatingFilterProxy</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

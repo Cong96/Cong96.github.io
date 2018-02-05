@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>CAS结合openldap | 迷途书童的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="CAS与openldap的结合openldap通常会在企业中用来进行用户验证，具体关于openldap的介绍，请看相应的openldap系列的文章，这篇文章只会介绍如何将cas-server4.0版本与openldap结合起来，即让openldap来充当登陆验证的工具。 0.修改配置 想要cas和openldap结合，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CAS结合openldap">
+<meta property="og:url" content="https://cong96.github.io/2018/02/05/CAS结合openldap/index.html">
+<meta property="og:site_name" content="迷途书童的博客">
+<meta property="og:description" content="CAS与openldap的结合openldap通常会在企业中用来进行用户验证，具体关于openldap的介绍，请看相应的openldap系列的文章，这篇文章只会介绍如何将cas-server4.0版本与openldap结合起来，即让openldap来充当登陆验证的工具。 0.修改配置 想要cas和openldap结合，只需要修改配置即可，当然前提是你已经有了相应的openldap服务器。 在网上">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-02-05T14:06:41.092Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CAS结合openldap">
+<meta name="twitter:description" content="CAS与openldap的结合openldap通常会在企业中用来进行用户验证，具体关于openldap的介绍，请看相应的openldap系列的文章，这篇文章只会介绍如何将cas-server4.0版本与openldap结合起来，即让openldap来充当登陆验证的工具。 0.修改配置 想要cas和openldap结合，只需要修改配置即可，当然前提是你已经有了相应的openldap服务器。 在网上">
+  
+    <link rel="alternate" href="/atom.xml" title="迷途书童的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">迷途书童的博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">一天进步一点</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://cong96.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-CAS结合openldap" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/02/05/CAS结合openldap/" class="article-date">
+  <time datetime="2018-02-05T14:22:29.687Z" itemprop="datePublished">2018-02-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/CAS/">CAS</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      CAS结合openldap
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h3 id="CAS与openldap的结合"><a href="#CAS与openldap的结合" class="headerlink" title="CAS与openldap的结合"></a>CAS与openldap的结合</h3><p>openldap通常会在企业中用来进行用户验证，具体关于openldap的介绍，请看相应的openldap系列的文章，这篇文章只会介绍如何将cas-server4.0版本与openldap结合起来，即让openldap来充当登陆验证的工具。</p>
+<p><strong>0.修改配置</strong></p>
+<p>想要cas和openldap结合，只需要修改配置即可，当然前提是你已经有了相应的openldap服务器。</p>
+<p>在网上对cas与openldap结合的文章很少，有的也是对cas-4.0以前的版本cas-3.x版本与openldap的结合。</p>
+<p>所以对于cas-server-4.0与openldap的结合，虽然并不复杂，但是还是值得记下来的。</p>
+<p>依旧是修改WEB-INF/deployerConfigContext.xml</p>
+<ul>
+<li>找到id为authenticationManager的bean，加入ldap验证入口，初始配置如下</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"authenticationManager"</span> <span class="attr">class</span>=<span class="string">"org.jasig.cas.authentication.PolicyBasedAuthenticationManager"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">constructor-arg</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">map</span>&gt;</span></span><br><span class="line">        </span><br><span class="line">              <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key-ref</span>=<span class="string">"proxyAuthenticationHandler"</span> <span class="attr">value-ref</span>=<span class="string">"proxyPrincipalResolver"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">                              <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key-ref</span>=<span class="string">"primaryAuthenticationHandler"</span> <span class="attr">value-ref</span>=<span class="string">"primaryPrincipalResolver"</span> /&gt;</span></span><br><span class="line">              </span><br><span class="line">              </span><br><span class="line">          <span class="tag">&lt;/<span class="name">map</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">constructor-arg</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"authenticationPolicy"</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.jasig.cas.authentication.AnyAuthenticationPolicy"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这里构造方法是由一个Map结构配置，就是配置登陆验证的形式，包括对于密码的配置等。</p>
+<p>其中的primaryAuthenticationHandler这个key对应着就是我们之前讲过的cas-server-4.0之后，不再是用户名和密码相同即可登陆，而是设置了默认用户名密码，这个默认的用户名密码就是用primaryAuthenticationHandler配置的。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"primaryAuthenticationHandler"</span></span><br><span class="line">      <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.jasig.cas.authentication.AcceptUsersAuthenticationHandler"</span>&gt;</span><br><span class="line">    &lt;property name=<span class="string">"users"</span>&gt;</span><br><span class="line">        &lt;map&gt;</span><br><span class="line">            &lt;entry key=<span class="string">"casuser"</span> value=<span class="string">"Mellon"</span>/&gt;</span><br><span class="line">        &lt;/map&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+<p>所以，如果我们还是想用单纯的用户名密码验证，可以在这里添加值，但是这样无疑显得过于笨拙。</p>
+<p>那么我们如果要想添加ldap的验证方式，那么毫无疑问我们要在authenticationManager中的构造方法中注册ldap验证形式。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"authenticationManager"</span> <span class="attr">class</span>=<span class="string">"org.jasig.cas.authentication.PolicyBasedAuthenticationManager"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">constructor-arg</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">map</span>&gt;</span></span><br><span class="line">               <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">                  | IMPORTANT</span></span><br><span class="line"><span class="comment">                  | Every handler requires a unique name.</span></span><br><span class="line"><span class="comment">                  | If more than one instance of the same handler class is configured, you must explicitly</span></span><br><span class="line"><span class="comment">                  | set its name to something other than its default name (typically the simple class name).</span></span><br><span class="line"><span class="comment">                  --&gt;</span></span><br><span class="line">               <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key-ref</span>=<span class="string">"proxyAuthenticationHandler"</span> <span class="attr">value-ref</span>=<span class="string">"proxyPrincipalResolver"</span> /&gt;</span></span><br><span class="line">               <span class="comment">&lt;!-- 注释掉默认用户名密码方式</span></span><br><span class="line"><span class="comment">                               &lt;entry key-ref="primaryAuthenticationHandler" value-ref="primaryPrincipalResolver" /&gt;</span></span><br><span class="line"><span class="comment">               </span></span><br><span class="line"><span class="comment">               </span></span><br><span class="line"><span class="comment">                --&gt;</span></span><br><span class="line">               <span class="comment">&lt;!--新增ldap认证的入口 --&gt;</span></span><br><span class="line">       		<span class="tag">&lt;<span class="name">entry</span> <span class="attr">key-ref</span>=<span class="string">"ldapAuthenticationHandler"</span> <span class="attr">value-ref</span>=<span class="string">"proxyPrincipalResolver"</span>/&gt;</span> </span><br><span class="line">           <span class="tag">&lt;/<span class="name">map</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">constructor-arg</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"authenticationPolicy"</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.jasig.cas.authentication.AnyAuthenticationPolicy"</span> /&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>完善ldap验证入口的相关必要配置。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"ldapAuthenticationHandler"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.jasig.cas.authentication.LdapAuthenticationHandler"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:principalIdAttribute</span>=<span class="string">"uid"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">c:authenticator-ref</span>=<span class="string">"authenticator"</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"principalAttributeMap"</span>&gt;</span>  </span><br><span class="line">          <span class="tag">&lt;<span class="name">map</span>&gt;</span>  </span><br><span class="line">              <span class="comment">&lt;!--  </span></span><br><span class="line"><span class="comment">                 | This map provides a simple attribute resolution mechanism.  </span></span><br><span class="line"><span class="comment">                 | Keys are LDAP attribute names, values are CAS attribute names.  </span></span><br><span class="line"><span class="comment">                 | Use this facility instead of a PrincipalResolver if LDAP is  </span></span><br><span class="line"><span class="comment">                 | the only attribute source.  </span></span><br><span class="line"><span class="comment">                 --&gt;</span>  </span><br><span class="line">			<span class="tag">&lt;<span class="name">entry</span> <span class="attr">key</span>=<span class="string">"uid"</span> <span class="attr">value</span>=<span class="string">"uid"</span> /&gt;</span>  </span><br><span class="line">              <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key</span>=<span class="string">"mail"</span> <span class="attr">value</span>=<span class="string">"mail"</span> /&gt;</span>  </span><br><span class="line">          <span class="tag">&lt;/<span class="name">map</span>&gt;</span>  </span><br><span class="line">      <span class="tag">&lt;/<span class="name">property</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">bean</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line"> <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"authenticator"</span> <span class="attr">class</span>=<span class="string">"org.ldaptive.auth.Authenticator"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">c:resolver-ref</span>=<span class="string">"dnResolver"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">c:handler-ref</span>=<span class="string">"authHandler"</span> /&gt;</span>  </span><br><span class="line"><span class="comment">&lt;!-- 配置baseDn  以及指定属性uid--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"dnResolver"</span> <span class="attr">class</span>=<span class="string">"org.ldaptive.auth.PooledSearchDnResolver"</span>  </span></span><br><span class="line"><span class="tag">       <span class="attr">p:baseDn</span>=<span class="string">"dc=ulic,dc=com,dc=cn"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">p:allowMultipleDns</span>=<span class="string">"false"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:subtreeSearch</span>=<span class="string">"true"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionFactory-ref</span>=<span class="string">"searchPooledLdapConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">      <span class="attr">p:userFilter</span>=<span class="string">"uid=&#123;user&#125;"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"searchPooledLdapConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.ldaptive.pool.PooledConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionPool-ref</span>=<span class="string">"searchConnectionPool"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"searchConnectionPool"</span> <span class="attr">parent</span>=<span class="string">"abstractConnectionPool"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionFactory-ref</span>=<span class="string">"searchConnectionFactory"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"searchConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.ldaptive.DefaultConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionConfig-ref</span>=<span class="string">"searchConnectionConfig"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"searchConnectionConfig"</span> <span class="attr">parent</span>=<span class="string">"abstractConnectionConfig"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionInitializer-ref</span>=<span class="string">"bindConnectionInitializer"</span> /&gt;</span>  </span><br><span class="line"><span class="comment">&lt;!--配置userDn和密码 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"bindConnectionInitializer"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.ldaptive.BindConnectionInitializer"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:bindDn</span>=<span class="string">"cn=Manager,dc=ulic,dc=com,dc=cn"</span>&gt;</span> </span><br><span class="line">      <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"bindCredential"</span>&gt;</span>  </span><br><span class="line">          <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.ldaptive.Credential"</span>  </span></span><br><span class="line"><span class="tag">              <span class="attr">c:password</span>=<span class="string">"redhat"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">property</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;/<span class="name">bean</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"abstractConnectionPool"</span> <span class="attr">abstract</span>=<span class="string">"true"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.ldaptive.pool.BlockingConnectionPool"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">init-method</span>=<span class="string">"initialize"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:poolConfig-ref</span>=<span class="string">"ldapPoolConfig"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:blockWaitTime</span>=<span class="string">"3000"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:validator-ref</span>=<span class="string">"searchValidator"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:pruneStrategy-ref</span>=<span class="string">"pruneStrategy"</span> /&gt;</span>  </span><br><span class="line">  <span class="comment">&lt;!--  不使用https p:useSSL="false"  使用https  p:sslConfig-ref="sslConfig" --&gt;</span></span><br><span class="line"><span class="comment">&lt;!--配置连接地址等与链接相关的信息--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"abstractConnectionConfig"</span> <span class="attr">abstract</span>=<span class="string">"true"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.ldaptive.ConnectionConfig"</span>  </span></span><br><span class="line"><span class="tag">  	  <span class="attr">p:ldapUrl</span>=<span class="string">"ldap://10.18.8.66:389"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:useStartTLS</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">p:useSSL</span>=<span class="string">"false"</span> </span></span><br><span class="line"><span class="tag">        /&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"ldapPoolConfig"</span> <span class="attr">class</span>=<span class="string">"org.ldaptive.pool.PoolConfig"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:minPoolSize</span>=<span class="string">"300"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:maxPoolSize</span>=<span class="string">"600"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:validateOnCheckOut</span>=<span class="string">"false"</span>    </span></span><br><span class="line"><span class="tag">        <span class="attr">p:validatePeriodically</span>=<span class="string">"true"</span>    </span></span><br><span class="line"><span class="tag">        <span class="attr">p:validatePeriod</span>=<span class="string">"300"</span> /&gt;</span>  </span><br><span class="line"><span class="comment">&lt;!--   支持http ssl时使用</span></span><br><span class="line"><span class="comment">  &lt;bean id="sslConfig" class="org.ldaptive.ssl.SslConfig"&gt;  </span></span><br><span class="line"><span class="comment">      &lt;property name="credentialConfig"&gt;  </span></span><br><span class="line"><span class="comment">          &lt;bean class="org.ldaptive.ssl.X509CredentialConfig"  </span></span><br><span class="line"><span class="comment">          p:trustCertificates="file:/E:/sso/wzyb.crt" /&gt; </span></span><br><span class="line"><span class="comment">      &lt;/property&gt;  </span></span><br><span class="line"><span class="comment">  &lt;/bean&gt;  </span></span><br><span class="line"><span class="comment">--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"pruneStrategy"</span> <span class="attr">class</span>=<span class="string">"org.ldaptive.pool.IdlePruneStrategy"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:prunePeriod</span>=<span class="string">"300"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:idleTime</span>=<span class="string">"600"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"searchValidator"</span> <span class="attr">class</span>=<span class="string">"org.ldaptive.pool.SearchValidator"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"authHandler"</span> <span class="attr">class</span>=<span class="string">"org.ldaptive.auth.PooledBindAuthenticationHandler"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionFactory-ref</span>=<span class="string">"bindPooledLdapConnectionFactory"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"bindPooledLdapConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.ldaptive.pool.PooledConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionPool-ref</span>=<span class="string">"bindConnectionPool"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"bindConnectionPool"</span> <span class="attr">parent</span>=<span class="string">"abstractConnectionPool"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionFactory-ref</span>=<span class="string">"bindConnectionFactory"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"bindConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">class</span>=<span class="string">"org.ldaptive.DefaultConnectionFactory"</span>  </span></span><br><span class="line"><span class="tag">        <span class="attr">p:connectionConfig-ref</span>=<span class="string">"bindConnectionConfig"</span> /&gt;</span>  </span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"bindConnectionConfig"</span> <span class="attr">parent</span>=<span class="string">"abstractConnectionConfig"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+</ul>
+<p>我们这里没有配置https，用的是简单的http方式访问，所以相关的https的配置注释掉了。</p>
+<p>这里还有一点需要注意，如果我们在abstractConnectionConfig这个bean的配置中配置了如下属性：</p>
+<p>​              p:connectTimeout=”3000”    </p>
+<p>配置了超时时间的话，程序依旧可以稳定运行，但是到了设置时间后，后台日志就会疯狂报错，一直报错，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDAP response read timed out, timeout used:3000ms</span><br></pre></td></tr></table></figure>
+<p>但是丝毫不影响程序的运行，登陆还是可以登陆的。为了解决这个问题，我也是试了好久，因为网上是真的没有相关资料呀。给我气的，后来发现，我只需要注释掉这个配置就不会报错了，而且程序还是会稳定运行，至少到现在为止还没发现有任何的异常。</p>
+<p>对于具体的配置目前还没有研究，先用这把，后续如果要加新的功能，那么肯定是需要深入研究配置的。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://cong96.github.io/2018/02/05/CAS结合openldap/" data-id="cjdab4v450004lkbzvqgdcdxw" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/02/05/数据库基础知识/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          数据库基础知识
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/31/DelegatingFilterProxy/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">DelegatingFilterProxy</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/CAS/">CAS</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java-WEB/">Java WEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaWEB/">JavaWEB</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mybatis/">Mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring/">Spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringMVC/">SpringMVC</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/js-css/">js&&css</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/02/05/CAS简单实例/">CAS简单实例</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/CAS/">CAS</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/数据库基础知识/">数据库基础知识</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/CAS结合openldap/">CAS结合openldap</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/DelegatingFilterProxy/">DelegatingFilterProxy</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
